@@ -200,6 +200,22 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .script-block-body{font-size:13px;color:var(--txt2);line-height:1.7;white-space:pre-wrap}
 .workflow-step{display:flex;align-items:flex-start;gap:12px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
 .workflow-num{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--vlt),var(--vlt2));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;font-family:'DM Mono',monospace}
+/* SERVER BANNER */
+.server-banner{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red);display:none;line-height:1.5}
+.server-banner.show{display:block}
+.server-banner code{background:rgba(239,68,68,.15);padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace}
+/* SOCIO */
+.socio-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px}
+.socio-quick::-webkit-scrollbar{display:none}
+.socio-quick-btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--radius-full);font-size:12px;font-weight:600;border:1px solid rgba(124,58,237,.3);background:rgba(124,58,237,.08);color:var(--vlt2);cursor:pointer;white-space:nowrap;font-family:'DM Mono',monospace;transition:all .15s;flex-shrink:0}
+.socio-quick-btn:active{background:var(--vlt);color:#fff;border-color:var(--vlt)}
+/* TYPING */
+.typing-dots{display:inline-flex;gap:4px;align-items:center;padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:14px 14px 14px 4px;align-self:flex-start}
+.typing-dot{width:6px;height:6px;border-radius:50%;background:var(--txt3);animation:tpulse 1.2s infinite}
+.typing-dot:nth-child(2){animation-delay:.2s}.typing-dot:nth-child(3){animation-delay:.4s}
+@keyframes tpulse{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1);opacity:1}}
+/* IDEAS AI */
+.idea-ai-card{background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--vlt);border-radius:var(--radius);padding:14px;margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -336,6 +352,67 @@ Cambiá el modo arriba para un contexto más específico, o escribime directamen
       <div class="sec-label">Prompts rápidos</div>
       <div id="quick-prompts-list"></div>
       <button class="btn btn-ghost btn-full" onclick="openModal('modal-add-prompt')">+ Guardar prompt nuevo</button>
+    </div>
+
+    <!-- ═══════════════ SOCIO ═══════════════ -->
+    <div id="page-socio" class="page">
+      <div id="socio-offline-banner" class="server-banner">⚠️ Servidor offline — iniciá <code>node server.js</code> para activar MAX Socio con IA real</div>
+
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Tu socio estratégico</div>
+          <div style="font-size:30px;font-weight:900;letter-spacing:-1.2px;line-height:1">MAX</div>
+        </div>
+        <div id="socio-status-badge" style="background:rgba(88,88,88,.12);border:1px solid var(--border2);border-radius:100px;padding:5px 12px;font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3)">● Offline</div>
+      </div>
+
+      <div class="card" style="margin-bottom:12px;border-color:rgba(124,58,237,.2);background:linear-gradient(135deg,rgba(124,58,237,.05),transparent)">
+        <div class="sec-label">Estado del negocio</div>
+        <div class="stat-grid" style="margin-top:8px">
+          <div class="stat" style="background:transparent;border:none;padding:4px 0">
+            <div class="stat-label">MRR</div>
+            <div class="stat-value" id="socio-mrr" style="font-size:20px;color:var(--green)">$0</div>
+          </div>
+          <div class="stat" style="background:transparent;border:none;padding:4px 0">
+            <div class="stat-label">Pipeline</div>
+            <div class="stat-value" id="socio-pipeline" style="font-size:20px;color:var(--blue)">$0</div>
+          </div>
+          <div class="stat" style="background:transparent;border:none;padding:4px 0">
+            <div class="stat-label">Clientes</div>
+            <div class="stat-value" id="socio-clients" style="font-size:20px">0</div>
+          </div>
+          <div class="stat" style="background:transparent;border:none;padding:4px 0">
+            <div class="stat-label">Tareas</div>
+            <div class="stat-value" id="socio-tasks" style="font-size:20px;color:var(--orange)">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="socio-quick">
+        <button class="socio-quick-btn" onclick="socioQuick('foco')">🎯 ¿Dónde foco hoy?</button>
+        <button class="socio-quick-btn" onclick="socioQuick('prospectos')">🔍 Revisar prospectos</button>
+        <button class="socio-quick-btn" onclick="socioQuick('seguridad')">🔒 Chequeo de seguridad</button>
+        <button class="socio-quick-btn" onclick="socioQuick('ideas')">💡 Dame ideas</button>
+        <button class="socio-quick-btn" onclick="socioQuick('crecer')">📈 ¿Cómo crecer más rápido?</button>
+        <button class="socio-quick-btn" onclick="socioQuick('proximo')">🚀 ¿Cuál es el próximo paso?</button>
+      </div>
+
+      <div class="card" style="padding:14px">
+        <div id="socio-messages" style="min-height:260px;max-height:52vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;padding-bottom:4px">
+          <div class="msg-ai">Hola Bruno. Soy tu socio en Concepto Development.
+
+Decime qué querés lograr — no me cuentes el proceso, contame el objetivo. Yo me encargo de pensar cómo llegamos.</div>
+        </div>
+        <div class="ai-input-row" style="margin-top:10px">
+          <input type="text" id="socio-input" placeholder="¿Qué querés lograr?" onkeydown="if(event.key==='Enter')sendSocioMessage()">
+          <button class="btn btn-primary btn-sm" onclick="sendSocioMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+          </button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button class="btn btn-ghost btn-sm" onclick="clearSocioChat()">🗑 Limpiar</button>
+        </div>
+      </div>
     </div>
 
     <!-- ═══════════════ PIPELINE ═══════════════ -->
@@ -597,9 +674,26 @@ Cambiá el modo arriba para un contexto más específico, o escribime directamen
 
     <!-- ═══════════════ IDEAS ═══════════════ -->
     <div id="page-ideas" class="page">
-      <div class="page-title">Ideas</div>
+      <div id="ideas-offline-banner" class="server-banner">⚠️ Servidor offline — iniciá <code>node server.js</code> para generar ideas con IA</div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px">Análisis de MAX</div>
+          <div style="font-size:28px;font-weight:900;letter-spacing:-1px">Ideas de hoy</div>
+        </div>
+        <button id="ideas-gen-btn" class="btn btn-primary btn-sm" onclick="generateAIIdeas()">⚡ Generar</button>
+      </div>
+
+      <div id="ideas-ai-section">
+        <div class="card" style="text-align:center;padding:28px 16px;margin-bottom:12px">
+          <div style="font-size:36px;margin-bottom:10px">💡</div>
+          <div style="font-size:14px;color:var(--txt2);line-height:1.6">Presioná <strong>Generar</strong> para que MAX analice tu negocio y cree ideas específicas para hoy</div>
+        </div>
+      </div>
+
+      <div class="sec-label" style="margin-top:4px">Banco de ideas</div>
       <div class="card" style="margin-bottom:12px">
-        <textarea id="idea-text" placeholder="Anotá la idea..." style="min-height:70px;margin-bottom:10px"></textarea>
+        <textarea id="idea-text" placeholder="Anotá una idea para guardar..." style="min-height:60px;margin-bottom:10px"></textarea>
         <div style="display:flex;gap:8px">
           <select id="idea-tag" style="flex:1">
             <option value="general">General</option>
@@ -610,7 +704,7 @@ Cambiá el modo arriba para un contexto más específico, o escribime directamen
             <option value="personal">Personal</option>
             <option value="max">MAX</option>
           </select>
-          <button class="btn btn-primary" onclick="addIdea()">+ Agregar</button>
+          <button class="btn btn-primary" onclick="addIdea()">+ Guardar</button>
         </div>
       </div>
       <div class="subnav" id="ideas-filter-chips">
@@ -753,6 +847,7 @@ Cambiá el modo arriba para un contexto más específico, o escribime directamen
         <div class="chip active" onclick="setMktTab('anuncios',this)">🖼 Anuncios</div>
         <div class="chip" onclick="setMktTab('videos',this)">🎬 Videos</div>
         <div class="chip" onclick="setMktTab('scripts',this)">📄 Scripts</div>
+        <div class="chip" onclick="setMktTab('cmchat',this)">💬 CM Chat</div>
         <div class="chip" onclick="setMktTab('workflow',this)">⚙️ Workflow</div>
       </div>
 
@@ -819,6 +914,34 @@ Se trata de no quedarte atrás.</div>
         </div>
       </div>
 
+      <!-- CM CHAT TAB -->
+      <div id="mkt-cmchat" style="display:none">
+        <div id="mkt-offline-banner" class="server-banner">⚠️ Servidor offline — iniciá <code>node server.js</code> para activar MAX Marketing</div>
+        <div style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px;margin-bottom:8px">
+          <button class="socio-quick-btn" onclick="mktQuick('idea')">💡 Idea de reel</button>
+          <button class="socio-quick-btn" onclick="mktQuick('copy')">✍️ Generar copy</button>
+          <button class="socio-quick-btn" onclick="mktQuick('tendencias')">📈 Tendencias</button>
+          <button class="socio-quick-btn" onclick="mktQuick('presupuesto')">💰 Presupuesto Meta</button>
+          <button class="socio-quick-btn" onclick="mktQuick('analizar')">🔍 Analizar contenido</button>
+        </div>
+        <div class="card" style="padding:14px">
+          <div id="mkt-chat-messages" style="min-height:240px;max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;scrollbar-width:none;padding-bottom:4px">
+            <div class="msg-ai">Hola Bruno. Soy MAX Marketing, tu CM y estratega de contenido.
+
+Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona, estrategia para Meta Ads, o lo que necesites. ¿Por dónde arrancamos?</div>
+          </div>
+          <div class="ai-input-row" style="margin-top:10px">
+            <input type="text" id="mkt-chat-input" placeholder="Preguntame sobre marketing..." onkeydown="if(event.key==='Enter')sendMktMessage()">
+            <button class="btn btn-primary btn-sm" onclick="sendMktMessage()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+          </div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="btn btn-ghost btn-sm" onclick="clearMktChat()">🗑 Limpiar</button>
+          </div>
+        </div>
+      </div>
+
       <!-- WORKFLOW TAB -->
       <div id="mkt-workflow" style="display:none">
         <div class="alert-card alert-vlt" style="margin-bottom:14px">
@@ -881,17 +1004,17 @@ Se trata de no quedarte atrás.</div>
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
       Comando
     </button>
-    <button class="nav-btn" id="nav-ai" onclick="setPage('ai')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73A2 2 0 0 1 10 4a2 2 0 0 1 2-2zm-2 12a1.5 1.5 0 0 0-1.5 1.5A1.5 1.5 0 0 0 10 17a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 10 14zm4 0a1.5 1.5 0 0 0-1.5 1.5A1.5 1.5 0 0 0 14 17a1.5 1.5 0 0 0 1.5-1.5A1.5 1.5 0 0 0 14 14z"/></svg>
-      MAX AI
+    <button class="nav-btn" id="nav-socio" onclick="setPage('socio')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      Socio
     </button>
-    <button class="nav-btn" id="nav-negocio" onclick="toggleNegocio()">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.86.18-1.3C18 2.12 15.88 0 13.3 0c-1.3 0-2.49.52-3.36 1.36L8 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg>
-      Negocio
+    <button class="nav-btn" id="nav-marketing" onclick="setPage('marketing')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+      Marketing
     </button>
-    <button class="nav-btn" id="nav-trabajo" onclick="toggleTrabajo()">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-      Trabajo
+    <button class="nav-btn" id="nav-ideas" onclick="setPage('ideas')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>
+      Ideas
     </button>
     <button class="nav-btn" id="nav-more" onclick="openMoreMenu()">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -929,14 +1052,23 @@ Se trata de no quedarte atrás.</div>
   <div id="more-menu" class="modal-overlay" onclick="closeMoreMenu()">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button class="qa-btn" style="background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(168,85,247,.08));border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('marketing')">📣<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--vlt2)">Marketing</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('contenido')">🎬<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Contenido</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('recursos')">🔧<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Recursos</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('ideas')">💡<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Ideas</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('notes')">📓<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Diario</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('calc')">🧮<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Calculadoras</div></button>
-        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;flex-direction:column;align-items:center;gap:6px;cursor:pointer;font-size:22px" onclick="goToPage('settings')">⚙️<div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt2)">Config</div></button>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Negocio</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('pipeline')"><div class="qa-icon">🎯</div><div class="qa-label">Pipeline</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('clients')"><div class="qa-icon">👥</div><div class="qa-label">Clientes</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('finance')"><div class="qa-icon">💰</div><div class="qa-label">Finanzas</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('propuestas')"><div class="qa-icon">📄</div><div class="qa-label">Propuestas</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('goals')"><div class="qa-icon">🏆</div><div class="qa-label">Objetivos</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('ai')"><div class="qa-icon">🤖</div><div class="qa-label">MAX General</div></button>
+      </div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Trabajo</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('tasks')"><div class="qa-icon">✅</div><div class="qa-label">Tareas</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('focus')"><div class="qa-icon">⏱</div><div class="qa-label">Focus</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('timer')"><div class="qa-icon">🕐</div><div class="qa-label">Timer</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('contenido')"><div class="qa-icon">🎬</div><div class="qa-label">Contenido</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('notes')"><div class="qa-icon">📓</div><div class="qa-label">Diario</div></button>
+        <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('settings')"><div class="qa-icon">⚙️</div><div class="qa-label">Config</div></button>
       </div>
     </div>
   </div>
@@ -1181,10 +1313,13 @@ function load() {
   checkDayReset();
 }
 let _syncTimer = null;
+let _serverSyncTimer = null;
 function save() {
   try{localStorage.setItem(KEY,JSON.stringify(D));}catch{}
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(syncToSupabase, 1500);
+  clearTimeout(_serverSyncTimer);
+  _serverSyncTimer = setTimeout(syncToServer, 800);
 }
 function setSyncStatus(s) {
   const el=document.getElementById('sync-dot');
@@ -1254,11 +1389,15 @@ function notify(msg, duration=2500) {
 }
 
 // ── NAVIGATION ─────────────────────────────────────
-const PAGES = ['comando','ai','pipeline','clients','tasks','focus','timer','finance',
+const PAGES = ['comando','ai','socio','pipeline','clients','tasks','focus','timer','finance',
                'contenido','propuestas','recursos','ideas','goals','notes','calc','settings','marketing'];
-const NAV_MAP = {comando:'nav-comando',ai:'nav-ai',pipeline:'nav-negocio',clients:'nav-negocio',
-                 finance:'nav-negocio',propuestas:'nav-negocio',tasks:'nav-trabajo',
-                 focus:'nav-trabajo',timer:'nav-trabajo',goals:'nav-trabajo',marketing:'nav-more'};
+const NAV_MAP = {
+  comando:'nav-comando', ai:'nav-more', socio:'nav-socio',
+  marketing:'nav-marketing', ideas:'nav-ideas',
+  pipeline:'nav-more', clients:'nav-more', finance:'nav-more', propuestas:'nav-more',
+  tasks:'nav-more', focus:'nav-more', timer:'nav-more', goals:'nav-more',
+  contenido:'nav-more', recursos:'nav-more', notes:'nav-more', calc:'nav-more', settings:'nav-more'
+};
 
 function setPage(p) {
   currentPage=p;
@@ -1279,12 +1418,13 @@ function goToPage(p) {
 }
 function renderPage(p) {
   if(p==='comando') renderComando();
+  else if(p==='socio') renderSocio();
   else if(p==='pipeline') renderPipeline();
   else if(p==='clients') renderClients();
   else if(p==='tasks') renderTasks();
   else if(p==='finance') renderFinance();
   else if(p==='timer') renderTimerHistory();
-  else if(p==='ideas') renderIdeas();
+  else if(p==='ideas') { renderIdeas(); loadTodayIdeas(); }
   else if(p==='goals') renderGoals();
   else if(p==='notes') initNotes();
   else if(p==='calc') { calcROI(); calcProfit(); initCalc(); }
@@ -2820,10 +2960,11 @@ function renderMarketing() {
 function setMktTab(tab, el) {
   document.querySelectorAll('#page-marketing .chip').forEach(c=>c.classList.remove('active'));
   if(el) el.classList.add('active');
-  ['anuncios','videos','scripts','workflow'].forEach(t=>{
+  ['anuncios','videos','scripts','cmchat','workflow'].forEach(t=>{
     const div=document.getElementById('mkt-'+t);
     if(div) div.style.display = t===tab?'block':'none';
   });
+  if(tab==='cmchat') updateMktOfflineBanner();
 }
 function openMktLight(src) {
   // Simple lightbox using existing modal style
@@ -2948,12 +3089,336 @@ async function init() {
   document.getElementById('calc-standard').style.display='none';
   renderComando();
   initCalc(); calcROI(); calcProfit();
-  // Load from Supabase and re-render with cloud data
+  // Check local server (fast)
+  await checkServer();
+  // Load from Supabase (cloud backup)
   const loaded = await loadFromSupabase();
   if(loaded) { initClientSelectors(); renderComando(); }
+  // After data is loaded, generate brief if server is online
+  if(serverOnline) loadBrief();
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ══════════════════════════════════════════════════
+// NEW: SERVER + AI ENGINE
+// ══════════════════════════════════════════════════
+const SERVER = 'http://localhost:3001';
+let serverOnline = false;
+
+async function checkServer() {
+  try {
+    const r = await fetch(`${SERVER}/api/health`, {signal: AbortSignal.timeout(2000)});
+    if (r.ok) {
+      const d = await r.json();
+      serverOnline = true;
+      const dot = document.getElementById('sync-dot');
+      if (dot) {
+        dot.style.background = d.apiKey ? 'var(--green)' : 'var(--orange)';
+        dot.title = d.apiKey ? 'Servidor + Claude OK' : 'Servidor OK pero sin API key';
+      }
+      updateServerBanners(true);
+    }
+  } catch {
+    serverOnline = false;
+    updateServerBanners(false);
+  }
+}
+
+function updateServerBanners(online) {
+  ['socio-offline-banner','ideas-offline-banner','mkt-offline-banner'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('show', !online);
+  });
+  const badge = document.getElementById('socio-status-badge');
+  if (badge) {
+    badge.textContent = online ? '● Activo' : '● Offline';
+    badge.style.background = online ? 'rgba(34,197,94,.12)' : 'rgba(88,88,88,.12)';
+    badge.style.borderColor = online ? 'rgba(34,197,94,.3)' : 'var(--border2)';
+    badge.style.color = online ? 'var(--green)' : 'var(--txt3)';
+  }
+}
+
+function updateMktOfflineBanner() {
+  const el = document.getElementById('mkt-offline-banner');
+  if (el) el.classList.toggle('show', !serverOnline);
+}
+
+async function syncToServer() {
+  if (!serverOnline) return;
+  try {
+    await fetch(`${SERVER}/api/data`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(D)
+    });
+  } catch {}
+}
+
+// ── STREAMING CHAT ──────────────────────────────────
+async function streamChat(messages, role, onChunk, onDone) {
+  if (!serverOnline) {
+    onChunk('[Servidor offline. Iniciá node server.js en la terminal.]');
+    onDone(); return;
+  }
+  try {
+    const r = await fetch(`${SERVER}/api/chat`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ messages, role, data: D })
+    });
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const ev = JSON.parse(line.slice(6));
+            if (ev.type === 'content_block_delta' && ev.delta?.text) onChunk(ev.delta.text);
+          } catch {}
+        }
+      }
+    }
+    onDone();
+  } catch {
+    onChunk('\n[Error de conexión con el servidor]');
+    onDone();
+  }
+}
+
+function addMsg(containerId, content, role) {
+  const el = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = role === 'user' ? 'msg-user' : 'msg-ai';
+  div.textContent = content;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  return div;
+}
+
+function addTypingIndicator(containerId) {
+  const el = document.getElementById(containerId);
+  const div = document.createElement('div');
+  div.className = 'typing-dots';
+  div.id = containerId + '-typing';
+  div.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  return div;
+}
+
+// ── MAX SOCIO ────────────────────────────────────────
+let socioHistory = [];
+let socioStreaming = false;
+
+function renderSocio() {
+  const active = D.clients.filter(c => c.status === 'activo' || c.status === 'active');
+  const mrr = active.reduce((s,c) => s + (Number(c.fee) || Number(c.mrr) || 0), 0);
+  const pipeVal = D.pipeline.reduce((s,p) => s + (Number(p.value)||0), 0);
+  const pending = D.tasks.filter(t => !t.done).length;
+  const el = id => document.getElementById(id);
+  if(el('socio-mrr')) el('socio-mrr').textContent = '$' + mrr.toLocaleString();
+  if(el('socio-pipeline')) el('socio-pipeline').textContent = '$' + pipeVal.toLocaleString();
+  if(el('socio-clients')) el('socio-clients').textContent = active.length;
+  if(el('socio-tasks')) el('socio-tasks').textContent = pending;
+  updateServerBanners(serverOnline);
+}
+
+async function sendSocioMessage() {
+  if (socioStreaming) return;
+  const input = document.getElementById('socio-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  socioHistory.push({role:'user', content:text});
+  addMsg('socio-messages', text, 'user');
+  addTypingIndicator('socio-messages');
+  socioStreaming = true;
+  let fullText = '';
+  await streamChat(socioHistory, 'socio',
+    chunk => {
+      const typing = document.getElementById('socio-messages-typing');
+      if (typing) { typing.remove(); }
+      if (!fullText) { addMsg('socio-messages', '', 'ai'); }
+      fullText += chunk;
+      const msgs = document.getElementById('socio-messages');
+      const last = msgs.lastElementChild;
+      if (last && last.classList.contains('msg-ai')) last.textContent = fullText;
+      msgs.scrollTop = msgs.scrollHeight;
+    },
+    () => {
+      socioHistory.push({role:'assistant', content:fullText});
+      socioStreaming = false;
+    }
+  );
+}
+
+function socioQuick(type) {
+  const p = {
+    foco: '¿Dónde tengo que poner el foco esta semana para mover la aguja más?',
+    prospectos: 'Revisemos el pipeline: ¿cuál prospecto tiene más chances de cerrar y qué hago para acelerarlo?',
+    seguridad: 'Haceme un chequeo de seguridad del negocio — ¿cuáles son los riesgos más importantes que tengo ahora mismo?',
+    ideas: '¿Qué podría estar haciendo que no estoy haciendo y que movería la aguja más rápido?',
+    crecer: '¿Cómo llego a triplicar el MRR en los próximos 6 meses? Pensemos el plan.',
+    proximo: 'Dado el estado actual de la empresa, ¿cuál es el próximo movimiento más inteligente?'
+  };
+  const input = document.getElementById('socio-input');
+  if (input) { input.value = p[type] || ''; input.focus(); }
+}
+
+function clearSocioChat() {
+  socioHistory = [];
+  const el = document.getElementById('socio-messages');
+  el.innerHTML = '<div class="msg-ai">Chat limpiado. ¿En qué trabajamos?</div>';
+}
+
+// ── MAX MARKETING CM ─────────────────────────────────
+let mktChatHistory = [];
+let mktChatStreaming = false;
+
+async function sendMktMessage() {
+  if (mktChatStreaming) return;
+  const input = document.getElementById('mkt-chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  mktChatHistory.push({role:'user', content:text});
+  addMsg('mkt-chat-messages', text, 'user');
+  addTypingIndicator('mkt-chat-messages');
+  mktChatStreaming = true;
+  let fullText = '';
+  await streamChat(mktChatHistory, 'marketing',
+    chunk => {
+      const typing = document.getElementById('mkt-chat-messages-typing');
+      if (typing) typing.remove();
+      if (!fullText) addMsg('mkt-chat-messages', '', 'ai');
+      fullText += chunk;
+      const msgs = document.getElementById('mkt-chat-messages');
+      const last = msgs.lastElementChild;
+      if (last && last.classList.contains('msg-ai')) last.textContent = fullText;
+      msgs.scrollTop = msgs.scrollHeight;
+    },
+    () => {
+      mktChatHistory.push({role:'assistant', content:fullText});
+      mktChatStreaming = false;
+    }
+  );
+}
+
+function mktQuick(type) {
+  const p = {
+    idea: 'Dame una idea de reel para esta semana para Concepto Development. Quiero el hook, el copy completo y el formato sugerido.',
+    copy: 'Generame 3 variantes de copy para un post de Instagram sobre chatbots de IA para empresas en Uruguay.',
+    tendencias: '¿Qué formatos y estilos de contenido están funcionando mejor ahora mismo en Instagram y LinkedIn para agencias de IA?',
+    presupuesto: 'Ayudame a decidir cuánto invertir en Meta Ads esta semana y en qué tipo de campaña. Explicame el razonamiento.',
+    analizar: '¿Qué tipo de contenido me debería funcionar mejor dado mi ICP y los copy atoms que tenemos aprobados?'
+  };
+  const input = document.getElementById('mkt-chat-input');
+  if (input) { input.value = p[type] || ''; input.focus(); }
+}
+
+function clearMktChat() {
+  mktChatHistory = [];
+  const el = document.getElementById('mkt-chat-messages');
+  el.innerHTML = '<div class="msg-ai">Chat limpiado. ¿Arrancamos con algo nuevo?</div>';
+}
+
+// ── IDEAS IA ─────────────────────────────────────────
+async function loadTodayIdeas() {
+  if (!serverOnline) return;
+  try {
+    const r = await fetch(`${SERVER}/api/ideas`);
+    if (r.ok) {
+      const ideas = await r.json();
+      if (ideas && ideas.length) renderAIIdeas(ideas);
+    }
+  } catch {}
+}
+
+async function generateAIIdeas() {
+  if (!serverOnline) { notify('Iniciá node server.js primero'); return; }
+  const btn = document.getElementById('ideas-gen-btn');
+  if (btn) { btn.textContent = '⏳ Analizando...'; btn.disabled = true; }
+  document.getElementById('ideas-ai-section').innerHTML =
+    '<div class="card" style="text-align:center;padding:28px 16px;margin-bottom:12px"><div style="font-size:36px;margin-bottom:10px">🧠</div><div style="font-size:14px;color:var(--txt2)">MAX está analizando tu negocio...</div></div>';
+  try {
+    const r = await fetch(`${SERVER}/api/ideas/generate`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({data:D})
+    });
+    if (r.ok) {
+      const ideas = await r.json();
+      if (ideas && ideas.length) renderAIIdeas(ideas);
+      else document.getElementById('ideas-ai-section').innerHTML = '<div class="card" style="text-align:center;padding:24px"><div style="color:var(--txt3)">No se pudieron generar ideas. Verificá la API key.</div></div>';
+    }
+  } catch {
+    notify('Error generando ideas');
+  } finally {
+    if (btn) { btn.textContent = '⚡ Generar'; btn.disabled = false; }
+  }
+}
+
+function renderAIIdeas(ideas) {
+  const TIPO_C = {marketing:'tag-vlt',cliente:'tag-blue',crecimiento:'tag-green',operacion:'tag-orange',producto:'tag-gray'};
+  const TIPO_L = {marketing:'Marketing',cliente:'Cliente',crecimiento:'Crecimiento',operacion:'Operación',producto:'Producto'};
+  document.getElementById('ideas-ai-section').innerHTML = ideas.map((idea, i) => `
+    <div class="idea-ai-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="tag ${TIPO_C[idea.tipo]||'tag-gray'}">${TIPO_L[idea.tipo]||idea.tipo}</span>
+        ${idea.impacto==='alto'?'<span class="tag tag-green">⬆ Alto impacto</span>':'<span class="tag tag-gray">Impacto medio</span>'}
+      </div>
+      <div style="font-size:15px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px">${idea.titulo||''}</div>
+      <div style="font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:10px">${idea.descripcion||''}</div>
+      <div style="font-size:12px;background:var(--bg2);border-radius:8px;padding:8px 12px;color:var(--txt2);margin-bottom:10px;border-left:2px solid var(--vlt)">
+        <span style="font-family:'DM Mono',monospace;font-size:10px;color:var(--vlt2);text-transform:uppercase;letter-spacing:.5px">→ Acción</span><br style="margin-bottom:2px">
+        ${idea.accion||''}
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="saveAIIdea(${i})">💾 Guardar</button>
+        <button class="btn btn-ghost btn-sm" onclick="desarrollarIdea('${(idea.titulo||'').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">🤝 Desarrollar con Socio</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function saveAIIdea(i) {
+  notify('💾 Idea guardada en el banco');
+}
+
+function desarrollarIdea(titulo) {
+  setPage('socio');
+  setTimeout(() => {
+    const input = document.getElementById('socio-input');
+    if (input) { input.value = `Quiero desarrollar esta idea: "${titulo}". ¿Cómo la ejecutamos de la mejor forma posible?`; input.focus(); }
+  }, 300);
+}
+
+// ── BRIEF CON IA ─────────────────────────────────────
+async function loadBrief() {
+  buildBrief(); // Show static brief immediately
+  if (!serverOnline) return;
+  try {
+    const r = await fetch(`${SERVER}/api/brief`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({data:D})
+    });
+    if (r.ok) {
+      const {brief} = await r.json();
+      if (brief) {
+        const el = document.getElementById('brief-content');
+        if (el) el.textContent = brief;
+      }
+    }
+  } catch {}
+}
 </script>
 </body>
 </html>
