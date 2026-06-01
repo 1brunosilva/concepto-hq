@@ -1088,6 +1088,103 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
     </div>
   </div>
 
+  <!-- PAGE: INSTAGRAM ANALYTICS -->
+  <div id="page-instagram" class="page" style="display:none">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="font-size:18px">📸</span>
+          <span style="font-size:18px;font-weight:800;letter-spacing:-.02em">@conceptodevelopment</span>
+        </div>
+        <div id="ig-page-meta" style="font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace"></div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="refreshIgData()" style="font-size:11px">↻ Actualizar</button>
+    </div>
+
+    <!-- KPIs principales -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
+      <div class="card-sm" style="text-align:center;padding:14px 8px">
+        <div style="font-size:22px;font-weight:800;color:var(--vlt2)" id="igp-followers">—</div>
+        <div style="font-size:10px;color:var(--txt3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-top:2px">Seguidores</div>
+      </div>
+      <div class="card-sm" style="text-align:center;padding:14px 8px">
+        <div style="font-size:22px;font-weight:800;color:var(--vlt2)" id="igp-posts">—</div>
+        <div style="font-size:10px;color:var(--txt3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-top:2px">Posts</div>
+      </div>
+      <div class="card-sm" style="text-align:center;padding:14px 8px">
+        <div style="font-size:22px;font-weight:800" id="igp-eng-rate">—</div>
+        <div style="font-size:10px;color:var(--txt3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-top:2px">Eng. Rate</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <div class="card-sm" style="padding:14px 16px">
+        <div style="font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:6px">Reach 30d</div>
+        <div style="font-size:26px;font-weight:800;color:var(--cream)" id="igp-reach">—</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px" id="igp-reach-best"></div>
+      </div>
+      <div class="card-sm" style="padding:14px 16px">
+        <div style="font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace;text-transform:uppercase;margin-bottom:6px">Views 30d</div>
+        <div style="font-size:26px;font-weight:800;color:var(--cream)" id="igp-views">—</div>
+        <div style="font-size:11px;color:var(--txt3);margin-top:4px" id="igp-views-sub"></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">
+      <div class="card-sm" style="text-align:center;padding:12px 6px">
+        <div style="font-size:18px;font-weight:800" id="igp-likes">—</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:2px">❤️ Likes</div>
+      </div>
+      <div class="card-sm" style="text-align:center;padding:12px 6px">
+        <div style="font-size:18px;font-weight:800" id="igp-shares">—</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:2px">↗ Shares</div>
+      </div>
+      <div class="card-sm" style="text-align:center;padding:12px 6px">
+        <div style="font-size:18px;font-weight:800" id="igp-saves">—</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:2px">🔖 Saves</div>
+      </div>
+      <div class="card-sm" style="text-align:center;padding:12px 6px">
+        <div style="font-size:18px;font-weight:800" id="igp-engaged">—</div>
+        <div style="font-size:10px;color:var(--txt3);margin-top:2px">👥 Engaged</div>
+      </div>
+    </div>
+
+    <!-- Gráfica Reach -->
+    <div class="card-sm" style="padding:16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace">Reach diario</div>
+        <div style="font-size:10px;color:var(--txt3)">últimos 30 días</div>
+      </div>
+      <svg id="igp-chart-reach" width="100%" height="80" viewBox="0 0 300 80" preserveAspectRatio="none" style="display:block"></svg>
+    </div>
+
+    <!-- Gráfica Interactions -->
+    <div class="card-sm" style="padding:16px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace">Interacciones diarias</div>
+        <div style="font-size:10px;color:var(--txt3)">likes + shares</div>
+      </div>
+      <div id="igp-chart-interactions" style="display:flex;align-items:flex-end;gap:2px;height:60px"></div>
+      <div id="igp-chart-labels" style="display:flex;justify-content:space-between;margin-top:4px"></div>
+    </div>
+
+    <!-- Posts -->
+    <div style="font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace;margin-bottom:10px">Contenido publicado</div>
+    <div id="igp-posts-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+
+    <!-- Insights -->
+    <div id="igp-insights" class="card-sm" style="padding:16px;margin-bottom:20px;display:none">
+      <div style="font-size:11px;font-weight:700;color:var(--vlt2);text-transform:uppercase;letter-spacing:.08em;font-family:'DM Mono',monospace;margin-bottom:10px">📊 Insights</div>
+      <div id="igp-insights-body" style="font-size:13px;color:var(--txt2);line-height:1.7"></div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:12px 14px;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.12);border-radius:10px;font-size:11px;color:var(--txt3);text-align:center">
+      Datos vía Windsor · <span id="igp-updated"></span> · Para refrescar pedíme "actualizá Instagram" en Claude Code
+    </div>
+  </div>
+
   <!-- SUB-NAV OVERLAY: TRABAJO -->
   <div id="trabajo-menu" class="modal-overlay" onclick="closeSubMenu('trabajo')">
     <div class="modal-sheet" onclick="event.stopPropagation()">
@@ -1105,6 +1202,10 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
   <div id="more-menu" class="modal-overlay" onclick="closeMoreMenu()">
     <div class="modal-sheet" onclick="event.stopPropagation()">
       <div class="modal-handle"></div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Analytics</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="qa-btn" style="background:linear-gradient(135deg,rgba(124,58,237,.15),rgba(168,85,247,.08));border:1px solid rgba(124,58,237,.3);border-radius:12px;padding:12px 8px" onclick="goToPage('instagram')"><div class="qa-icon">📸</div><div class="qa-label" style="color:var(--vlt2)">Instagram</div></button>
+      </div>
       <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txt3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Negocio</div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
         <button class="qa-btn" style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 8px" onclick="goToPage('pipeline')"><div class="qa-icon">🎯</div><div class="qa-label">Pipeline</div></button>
@@ -1443,13 +1544,14 @@ function notify(msg, duration=2500) {
 
 // ── NAVIGATION ─────────────────────────────────────
 const PAGES = ['comando','ai','socio','pipeline','clients','tasks','focus','timer','finance',
-               'contenido','propuestas','recursos','ideas','goals','notes','calc','settings','marketing'];
+               'contenido','propuestas','recursos','ideas','goals','notes','calc','settings','marketing','instagram'];
 const NAV_MAP = {
   comando:'nav-comando', ai:'nav-more', socio:'nav-socio',
   marketing:'nav-marketing', ideas:'nav-ideas',
   pipeline:'nav-more', clients:'nav-more', finance:'nav-more', propuestas:'nav-more',
   tasks:'nav-more', focus:'nav-more', timer:'nav-more', goals:'nav-more',
-  contenido:'nav-more', recursos:'nav-more', notes:'nav-more', calc:'nav-more', settings:'nav-more'
+  contenido:'nav-more', recursos:'nav-more', notes:'nav-more', calc:'nav-more', settings:'nav-more',
+  instagram:'nav-more'
 };
 
 function setPage(p) {
@@ -1487,6 +1589,7 @@ function renderPage(p) {
   else if(p==='focus') renderFocusSessions();
   else if(p==='settings') loadSettings();
   else if(p==='marketing') renderMarketing();
+  else if(p==='instagram') loadInstagramPage();
 }
 function toggleNegocio() {
   const m=document.getElementById('negocio-menu');
@@ -2937,7 +3040,7 @@ function saveQuickPrompt() {
 const CDN = 'https://cdn.jsdelivr.net/gh/1brunosilva/Concepto-Robot@main/max-automatico/';
 
 const MKT_PIECES = [
-  { id:'A1', tipo:'imagen', prioridad:true, titulo:'Amenaza Silenciosa', copy:'Cada mes que esperás, tu competencia te saca más ventaja. Sin apuro.', formato:'4:5 · Feed', plataformas:'Instagram · LinkedIn', thumb: CDN+'NEW-A1-AmenazaSilenciosa.png', defaultStatus:'lista' },
+  { id:'A1', tipo:'imagen', prioridad:true, titulo:'Amenaza Silenciosa', copy:'Cada mes que esperás, tu competencia te saca más ventaja. Sin apuro.', formato:'4:5 · Feed', plataformas:'Instagram · LinkedIn', thumb: CDN+'NEW-A1-AmenazaSilenciosa-v4.png', defaultStatus:'lista' },
   { id:'A3', tipo:'imagen', prioridad:true, titulo:'Costo de Oportunidad', copy:'¿Cuánto te cuesta cada mes que no automatizás?', formato:'4:5 · Feed', plataformas:'Instagram · LinkedIn', thumb: null, defaultStatus:'pendiente' },
   { id:'A5', tipo:'imagen', prioridad:true, titulo:'Velocidad Asimétrica', copy:'Tu empresa a 60 km/h. Tu competencia con IA: 300. La brecha crece cada día.', formato:'4:5 · Feed', plataformas:'Instagram · LinkedIn', thumb: null, defaultStatus:'pendiente' },
   { id:'A9', tipo:'imagen', prioridad:true, titulo:'La Pregunta Incómoda', copy:'¿Por qué tu competencia está creciendo más rápido que vos?', formato:'4:5 · Feed', plataformas:'Instagram · LinkedIn', thumb: null, defaultStatus:'pendiente' },
@@ -3078,6 +3181,228 @@ async function loadIgAnalytics() {
     }).join('');
   } catch(e) { console.error('IG analytics error', e); }
 }
+// ── INSTAGRAM PAGE ────────────────────────────────
+let _igData = null;
+
+async function loadInstagramPage() {
+  if(!serverOnline) {
+    document.getElementById('igp-page-meta') && (document.getElementById('igp-page-meta').textContent = 'Server offline');
+    return;
+  }
+  try {
+    const res = await fetch('/api/instagram');
+    if(!res.ok) return;
+    _igData = await res.json();
+    renderInstagramPage(_igData);
+  } catch(e) { console.error('IG page error', e); }
+}
+
+function renderInstagramPage(ig) {
+  if(!ig) return;
+
+  // Meta
+  const upd = ig.updated ? new Date(ig.updated).toLocaleDateString('es-UY',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  const m = document.getElementById('ig-page-meta');
+  if(m) m.textContent = `${ig.account?.followers ?? 0} seguidores · ${ig.account?.media_count ?? 0} posts · actualizado ${upd}`;
+  const up2 = document.getElementById('igp-updated');
+  if(up2) up2.textContent = upd;
+
+  const L = ig.last30d || {};
+  const totalReach = L.reach || 0;
+  const totalInter = L.total_interactions || 0;
+  const engRate = totalReach > 0 ? ((totalInter / totalReach)*100).toFixed(1)+'%' : '—';
+
+  // KPIs
+  _setEl('igp-followers', ig.account?.followers ?? '—');
+  _setEl('igp-posts', ig.account?.media_count ?? '—');
+  _setEl('igp-eng-rate', engRate);
+  _setEl('igp-reach', totalReach.toLocaleString());
+  _setEl('igp-views', (L.views||0).toLocaleString());
+  _setEl('igp-likes', L.likes||0);
+  _setEl('igp-shares', L.shares||0);
+  _setEl('igp-saves', L.saves||0);
+  _setEl('igp-engaged', L.accounts_engaged||0);
+
+  // Best day
+  const daily = ig.daily || [];
+  const bestDay = daily.reduce((a,b)=>b.reach>a.reach?b:a, {reach:0,date:''});
+  const bd = document.getElementById('igp-reach-best');
+  if(bd && bestDay.reach > 0) bd.textContent = `Mejor: ${bestDay.date?.slice(5)} (${bestDay.reach})`;
+  const vs = document.getElementById('igp-views-sub');
+  if(vs) vs.textContent = `${(L.views||0)} vistas totales`;
+
+  // Engagement rate color
+  const erEl = document.getElementById('igp-eng-rate');
+  if(erEl) {
+    const erNum = parseFloat(engRate);
+    erEl.style.color = erNum >= 10 ? 'var(--green)' : erNum >= 5 ? 'var(--vlt2)' : 'var(--txt1)';
+  }
+
+  // Chart: Reach (SVG area chart)
+  renderIgReachChart(daily);
+
+  // Chart: Interactions (bar chart)
+  renderIgInteractionsChart(daily);
+
+  // Posts
+  renderIgPosts(ig.posts || []);
+
+  // Insights
+  renderIgInsights(ig);
+}
+
+function _setEl(id, val) {
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+function renderIgReachChart(daily) {
+  const svg = document.getElementById('igp-chart-reach');
+  if(!svg) return;
+  const W=300, H=80, pad=4;
+  const vals = daily.map(d=>d.reach||0);
+  const maxV = Math.max(...vals, 1);
+  const n = vals.length;
+  const xStep = (W-pad*2)/(n-1);
+
+  // Build path points
+  const pts = vals.map((v,i)=>{
+    const x = pad + i*xStep;
+    const y = H - pad - ((v/maxV)*(H-pad*2));
+    return [x,y];
+  });
+
+  // Smooth line using simple bezier
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for(let i=1;i<pts.length;i++){
+    const cp1x = pts[i-1][0] + xStep*0.4;
+    const cp1y = pts[i-1][1];
+    const cp2x = pts[i][0] - xStep*0.4;
+    const cp2y = pts[i][1];
+    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i][0]} ${pts[i][1]}`;
+  }
+
+  // Area path (close to bottom)
+  const areaD = d + ` L ${pts[pts.length-1][0]} ${H} L ${pts[0][0]} ${H} Z`;
+
+  svg.innerHTML = `
+    <defs>
+      <linearGradient id="ig-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <path d="${areaD}" fill="url(#ig-grad)"/>
+    <path d="${d}" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-linecap="round"/>
+    ${vals.map((v,i)=>v>0?`<circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="2.5" fill="#a855f7"/>`:``).join('')}
+  `;
+}
+
+function renderIgInteractionsChart(daily) {
+  const container = document.getElementById('igp-chart-interactions');
+  const labels = document.getElementById('igp-chart-labels');
+  if(!container) return;
+  const maxV = Math.max(...daily.map(d=>(d.interactions||0)), 1);
+  const active = daily.filter(d=>(d.interactions||0)>0);
+
+  container.innerHTML = daily.map(d=>{
+    const v = d.interactions||0;
+    const h = Math.max(Math.round((v/maxV)*60), v>0?4:1);
+    const isActive = v > 0;
+    return `<div title="${d.date?.slice(5)}: ${v} interacciones" style="flex:1;display:flex;align-items:flex-end">
+      <div style="width:100%;height:${h}px;background:${isActive?'var(--vlt)':'rgba(255,255,255,.06)'};border-radius:2px 2px 0 0;opacity:${isActive?'.85':'1'}"></div>
+    </div>`;
+  }).join('');
+
+  // Labels: only show first, middle, last dates
+  if(labels && daily.length > 0) {
+    const first = daily[0]?.date?.slice(5) || '';
+    const mid = daily[Math.floor(daily.length/2)]?.date?.slice(5) || '';
+    const last = daily[daily.length-1]?.date?.slice(5) || '';
+    labels.innerHTML = `
+      <span style="font-size:9px;color:var(--txt3);font-family:'DM Mono',monospace">${first}</span>
+      <span style="font-size:9px;color:var(--txt3);font-family:'DM Mono',monospace">${mid}</span>
+      <span style="font-size:9px;color:var(--txt3);font-family:'DM Mono',monospace">${last}</span>
+    `;
+  }
+}
+
+function renderIgPosts(posts) {
+  const container = document.getElementById('igp-posts-list');
+  if(!container) return;
+  if(!posts.length) { container.innerHTML = '<div style="color:var(--txt3);font-size:13px;text-align:center;padding:20px">Sin posts todavía</div>'; return; }
+
+  container.innerHTML = posts.map((p,i) => {
+    const engRate = p.reach > 0 ? ((p.engagement/p.reach)*100).toFixed(1) : '0';
+    const engColor = parseFloat(engRate) >= 15 ? 'var(--green)' : parseFloat(engRate) >= 5 ? 'var(--vlt2)' : 'var(--txt2)';
+    const badge = p.type === 'REELS' ? '🎬 Reel' : p.type === 'IMAGE' ? '📸 Imagen' : p.type;
+    const watchSec = p.avg_watch_ms ? (p.avg_watch_ms/1000).toFixed(1)+'s promedio' : null;
+    const isBest = i === 0;
+
+    return `<div class="card-sm" style="padding:16px;${isBest?'border-color:rgba(124,58,237,.4)':''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:10px;font-weight:700;color:var(--txt3);font-family:'DM Mono',monospace;background:var(--bg2);border:1px solid var(--border);padding:2px 8px;border-radius:5px">${badge}</span>
+        <span style="font-size:11px;color:var(--txt3)">${p.date}</span>
+        ${isBest?`<span style="font-size:10px;font-weight:700;color:var(--vlt2);background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.25);padding:2px 8px;border-radius:5px">⭐ Mejor</span>`:''}
+        <a href="${p.url}" target="_blank" style="margin-left:auto;font-size:11px;color:var(--vlt2);text-decoration:none;font-weight:600">↗ Ver</a>
+      </div>
+      <div style="font-size:12px;color:var(--txt2);line-height:1.5;margin-bottom:12px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${p.caption}</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:${watchSec?'10px':'0'}">
+        <div style="text-align:center">
+          <div style="font-size:16px;font-weight:800">${p.reach}</div>
+          <div style="font-size:10px;color:var(--txt3)">Reach</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:16px;font-weight:800">${p.views}</div>
+          <div style="font-size:10px;color:var(--txt3)">Views</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:16px;font-weight:800">${p.likes}</div>
+          <div style="font-size:10px;color:var(--txt3)">Likes</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:16px;font-weight:800;color:${engColor}">${engRate}%</div>
+          <div style="font-size:10px;color:var(--txt3)">Eng.</div>
+        </div>
+      </div>
+      ${watchSec?`<div style="font-size:11px;color:var(--txt3);background:var(--bg2);border-radius:6px;padding:6px 10px;font-family:'DM Mono',monospace">⏱ Watch time: <strong style="color:var(--cream)">${watchSec}</strong> · ${p.shares} shares · ${p.saves} saves</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderIgInsights(ig) {
+  const container = document.getElementById('igp-insights');
+  const body = document.getElementById('igp-insights-body');
+  if(!container||!body) return;
+  const posts = ig.posts||[];
+  const L = ig.last30d||{};
+  if(!posts.length) return;
+
+  const insights = [];
+  const reel = posts.find(p=>p.type==='REELS');
+  const img = posts.find(p=>p.type==='IMAGE');
+  if(reel && img) {
+    const ratio = reel.reach > img.reach ? (reel.reach/Math.max(img.reach,1)).toFixed(1) : null;
+    if(ratio) insights.push(`El Reel tuvo <strong style="color:var(--cream)">${ratio}x más reach</strong> que la imagen (${reel.reach} vs ${img.reach}). El video supera el estático — priorizar reels.`);
+    if(reel.avg_watch_ms) insights.push(`Watch time promedio del reel: <strong style="color:var(--cream)">${(reel.avg_watch_ms/1000).toFixed(1)} segundos</strong>. Para contenido de 15s, eso es retención alta.`);
+  }
+  const engReel = reel && reel.reach > 0 ? ((reel.engagement/reel.reach)*100).toFixed(1) : null;
+  if(engReel && parseFloat(engReel) >= 10) insights.push(`Engagement rate del reel: <strong style="color:var(--green)">${engReel}%</strong>. Promedio de Instagram para cuentas nuevas es 3-6%. Estás muy por encima.`);
+  if((L.reach||0) > 0 && (ig.account?.followers||0) < 50) insights.push(`Con solo <strong style="color:var(--cream)">${ig.account?.followers} seguidores</strong>, alcanzaste ${L.reach} personas orgánico. Esto indica que el contenido está siendo distribuido por el algoritmo más allá de tu audiencia.`);
+  insights.push(`Próximo paso: publicar con mayor frecuencia (3-4x/semana) para que el algoritmo entienda la cuenta. El primer mes define el momentum.`);
+
+  if(insights.length) {
+    body.innerHTML = insights.map(t=>`<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">${t}</div>`).join('');
+    container.style.display = 'block';
+  }
+}
+
+function refreshIgData() {
+  _setEl('igp-followers','...');
+  _setEl('igp-reach','...');
+  loadInstagramPage();
+}
+
 function openMktLight(src) {
   // Simple lightbox using existing modal style
   let lb = document.getElementById('mkt-lightbox');
