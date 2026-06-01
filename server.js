@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Load .env file if it exists
 function loadEnv() {
