@@ -23,6 +23,7 @@ function loadEnv() {
 loadEnv();
 
 const API_KEY = process.env.ANTHROPIC_API_KEY || '';
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const DATA_FILE = path.join(__dirname, 'data', 'hq-data.json');
 const BRIEF_FILE = path.join(__dirname, 'data', 'brief-cache.json');
 const IDEAS_FILE = path.join(__dirname, 'data', 'ideas-cache.json');
@@ -40,6 +41,15 @@ function readJSON(file, fallback = {}) {
 }
 function writeJSON(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+function requireAuth(req, res) {
+  if (!ADMIN_TOKEN) return true;
+  const auth = req.headers['authorization'] || '';
+  if (auth === `Bearer ${ADMIN_TOKEN}`) return true;
+  res.writeHead(401, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ error: 'Unauthorized' }));
+  return false;
 }
 
 // ── SYSTEM PROMPTS ───────────────────────────────────────
@@ -398,12 +408,17 @@ function callClaude(system, userMessage, callback) {
 // ── HTTP SERVER ──────────────────────────────────────────
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 
   if (req.method === 'OPTIONS') { res.writeHead(200); res.end(); return; }
 
   const { pathname } = url.parse(req.url);
+
+  // ── Auth gate for all /api/* except /api/health ──
+  if (pathname.startsWith('/api/') && pathname !== '/api/health') {
+    if (!requireAuth(req, res)) return;
+  }
 
   // ── GET /api/health ──
   if (req.method === 'GET' && pathname === '/api/health') {
@@ -562,6 +577,33 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ── GET /api/export ──
+  if (req.method === 'GET' && pathname === '/api/export') {
+    const data = fs.existsSync(DATA_FILE) ? fs.readFileSync(DATA_FILE, 'utf8') : '{}';
+    const date = new Date().toISOString().slice(0, 10);
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="hq-data-${date}.json"`
+    });
+    res.end(data);
+    return;
+  }
+
+  // ── POST /api/import ──
+  if (req.method === 'POST' && pathname === '/api/import') {
+    let body = '';
+    req.on('data', d => body += d);
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        writeJSON(DATA_FILE, data);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } catch { res.writeHead(400); res.end(JSON.stringify({ error: 'Invalid JSON' })); }
+    });
+    return;
+  }
+
   // ── GET /api/instagram ──
   if (req.method === 'GET' && pathname === '/api/instagram') {
     const ig = readJSON(IG_FILE, null);
@@ -588,7 +630,8 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n✅ Concepto HQ corriendo en http://localhost:${PORT}`);
-  console.log(`   API Key: ${API_KEY ? '✅ configurada' : '❌ falta — exportá ANTHROPIC_API_KEY'}`);
+  console.log(`   API Key:     ${API_KEY ? '✅ configurada' : '❌ falta — exportá ANTHROPIC_API_KEY'}`);
+  console.log(`   Admin Token: ${ADMIN_TOKEN ? '✅ configurado' : '⚠️  sin token — API pública'}`);
   console.log(`   Data: ${DATA_FILE}`);
   console.log(`\n   Abrí la app y el servidor se conecta solo.\n`);
 });

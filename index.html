@@ -204,6 +204,35 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .server-banner{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--red);display:none;line-height:1.5}
 .server-banner.show{display:block}
 .server-banner code{background:rgba(239,68,68,.15);padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace}
+/* DASHBOARD KPIs strip */
+.dash-kpis{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;margin-bottom:14px;padding-bottom:2px}
+.dash-kpis::-webkit-scrollbar{display:none}
+.dash-kpi{flex-shrink:0;width:138px;background:var(--bg1);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:border-color .15s}
+.dash-kpi:active{border-color:var(--border2);transform:scale(.98)}
+.dash-kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dash-kpi-label{font-size:10px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--txt3)}
+.dash-kpi-icon{opacity:.35}
+.dash-kpi-value{font-size:26px;font-weight:900;letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.dash-kpi-sub{font-size:11px;color:var(--txt3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Goal progress */
+.dash-goal{margin-bottom:14px}
+.dash-goal:last-child{margin-bottom:0}
+.dash-goal-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.dash-goal-name{font-size:13px;font-weight:600}
+.dash-goal-nums{font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace}
+.dash-goal-meta{display:flex;justify-content:space-between;margin-top:5px}
+.dash-goal-pct{font-size:11px;color:var(--txt3)}
+.dash-goal-rem{font-size:11px;color:var(--txt3)}
+/* Top clients list */
+.dash-client-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.dash-client-row:last-child{border-bottom:none;padding-bottom:0}
+/* Pipeline stage bars */
+.dash-stage-row{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dash-stage-row:last-child{margin-bottom:0}
+.dash-stage-label{font-size:10px;color:var(--txt3);width:72px;flex-shrink:0;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.04em}
+.dash-stage-bar-wrap{flex:1;background:var(--bg3);border-radius:100px;height:5px}
+.dash-stage-bar-fill{height:100%;border-radius:100px;min-width:2px;transition:width .4s}
+.dash-stage-count{font-size:12px;font-weight:700;width:18px;text-align:right;flex-shrink:0}
 /* SOCIO */
 .socio-quick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:12px}
 .socio-quick::-webkit-scrollbar{display:none}
@@ -216,6 +245,10 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 @keyframes tpulse{0%,80%,100%{transform:scale(.8);opacity:.5}40%{transform:scale(1);opacity:1}}
 /* IDEAS AI */
 .idea-ai-card{background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--vlt);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+/* AUTH MODAL */
+#auth-modal{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);backdrop-filter:blur(8px)}
+#auth-modal.open{display:flex}
+#auth-modal-box{background:#07070a;border:1px solid #2a2a35;border-radius:18px;padding:32px 24px;width:min(360px,calc(100vw - 32px));font-family:'Inter',system-ui}
 </style>
 </head>
 <body>
@@ -234,7 +267,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     <div id="header-right">
       <div id="header-date" style="font-size:12px;color:var(--txt3);font-family:'DM Mono',monospace"></div>
       <div id="sync-dot" title="Sincronizando..." style="width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:background .3s;flex-shrink:0"></div>
-      <button class="hdr-btn" onclick="openModal('modal-settings')" style="padding:6px 8px;font-size:16px;background:none;border:none">⚙️</button>
+      <button class="hdr-btn" onclick="openModal('modal-settings');document.getElementById('cfg-admin-token').value=getAuthToken()" style="padding:6px 8px;font-size:16px;background:none;border:none">⚙️</button>
     </div>
   </div>
 
@@ -243,64 +276,120 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
     <!-- ═══════════════ COMANDO ═══════════════ -->
     <div id="page-comando" class="page active">
-      <div id="morning-brief" class="card" style="border-color:var(--vlt);background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(168,85,247,.04))">
-        <div class="sec-label">Brief del día</div>
-        <div id="brief-content" style="font-size:14px;line-height:1.8;color:var(--txt2)">Cargando...</div>
-      </div>
-      <!-- Energy check-in -->
-      <div class="card" id="energy-card">
-        <div class="sec-label">Energía hoy</div>
-        <div style="display:flex;gap:8px;align-items:center" id="energy-btns">
-          <button class="energy-btn" onclick="setEnergy(1)" data-e="1">😴</button>
-          <button class="energy-btn" onclick="setEnergy(2)" data-e="2">😐</button>
-          <button class="energy-btn" onclick="setEnergy(3)" data-e="3">🙂</button>
-          <button class="energy-btn" onclick="setEnergy(4)" data-e="4">😊</button>
-          <button class="energy-btn" onclick="setEnergy(5)" data-e="5">🔥</button>
-          <span id="energy-saved" style="font-size:12px;color:var(--txt3);font-family:'DM Mono',monospace;margin-left:4px"></span>
+
+      <!-- 5 KPI Cards — scroll horizontal -->
+      <div class="dash-kpis">
+        <div class="dash-kpi" onclick="setPage('finance')">
+          <div class="dash-kpi-top">
+            <div class="dash-kpi-label">MRR</div>
+            <svg class="dash-kpi-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--green)"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+          </div>
+          <div class="dash-kpi-value" id="kpi-mrr" style="color:var(--green)">$0</div>
+          <div class="dash-kpi-sub" id="kpi-mrr-sub">recurrente</div>
+        </div>
+        <div class="dash-kpi" onclick="setPage('pipeline')">
+          <div class="dash-kpi-top">
+            <div class="dash-kpi-label">Pipeline</div>
+            <svg class="dash-kpi-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--blue)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+          </div>
+          <div class="dash-kpi-value" id="kpi-pipeline" style="color:var(--blue)">$0</div>
+          <div class="dash-kpi-sub" id="kpi-pipeline-sub">en prospectos</div>
+        </div>
+        <div class="dash-kpi" onclick="setPage('clients')">
+          <div class="dash-kpi-top">
+            <div class="dash-kpi-label">Clientes</div>
+            <svg class="dash-kpi-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--txt2)"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+          </div>
+          <div class="dash-kpi-value" id="kpi-clients">0</div>
+          <div class="dash-kpi-sub" id="kpi-clients-sub">activos</div>
+        </div>
+        <div class="dash-kpi" onclick="setPage('tasks')">
+          <div class="dash-kpi-top">
+            <div class="dash-kpi-label">Tareas</div>
+            <svg class="dash-kpi-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--orange)"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <div class="dash-kpi-value" id="kpi-tasks" style="color:var(--orange)">0</div>
+          <div class="dash-kpi-sub" id="kpi-tasks-sub">pendientes</div>
+        </div>
+        <div class="dash-kpi" onclick="setPage('marketing')">
+          <div class="dash-kpi-top">
+            <div class="dash-kpi-label">Publicadas</div>
+            <svg class="dash-kpi-icon" width="16" height="16" viewBox="0 0 24 24" fill="var(--vlt2)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          </div>
+          <div class="dash-kpi-value" id="kpi-published" style="color:var(--vlt2)">0</div>
+          <div class="dash-kpi-sub">piezas</div>
         </div>
       </div>
-      <!-- KPI Stats -->
-      <div class="stat-grid">
-        <div class="stat" onclick="setPage('finance')" style="cursor:pointer">
-          <div class="stat-label">MRR</div>
-          <div class="stat-value" id="kpi-mrr" style="color:var(--green)">$0</div>
-          <div class="stat-sub" id="kpi-mrr-sub">recurrente</div>
+
+      <!-- Ingresos mes a mes -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="sec-label">Ingresos mes a mes</div>
+        <svg id="dash-mrr-svg" width="100%" height="88" viewBox="0 0 320 88" preserveAspectRatio="none" style="display:block;margin:4px 0"></svg>
+        <div id="dash-mrr-labels" style="display:flex;justify-content:space-between"></div>
+      </div>
+
+      <!-- Objetivos del mes -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="sec-label">Objetivos del mes</div>
+        <div class="dash-goal">
+          <div class="dash-goal-header">
+            <div class="dash-goal-name">MRR mensual</div>
+            <div class="dash-goal-nums" id="dash-goal-mrr-nums">$0 / $2.500</div>
+          </div>
+          <div class="progress-wrap"><div class="progress-fill" id="dash-goal-mrr-bar" style="width:0%"></div></div>
+          <div class="dash-goal-meta">
+            <div class="dash-goal-pct" id="dash-goal-mrr-pct">0% del objetivo</div>
+            <div class="dash-goal-rem" id="dash-goal-mrr-rem">Faltan $2.500</div>
+          </div>
         </div>
-        <div class="stat" onclick="setPage('pipeline')" style="cursor:pointer">
-          <div class="stat-label">Pipeline</div>
-          <div class="stat-value" id="kpi-pipeline" style="color:var(--blue)">$0</div>
-          <div class="stat-sub" id="kpi-pipeline-sub">en prospectos</div>
-        </div>
-        <div class="stat" onclick="setPage('tasks')" style="cursor:pointer">
-          <div class="stat-label">Tareas hoy</div>
-          <div class="stat-value" id="kpi-tasks" style="color:var(--orange)">0</div>
-          <div class="stat-sub" id="kpi-tasks-sub">pendientes</div>
-        </div>
-        <div class="stat" onclick="setPage('timer')" style="cursor:pointer">
-          <div class="stat-label">Trabajado</div>
-          <div class="stat-value" id="kpi-timer" style="font-size:18px;font-family:'DM Mono',monospace">0h</div>
-          <div class="stat-sub">esta semana</div>
+        <div class="dash-goal">
+          <div class="dash-goal-header">
+            <div class="dash-goal-name">Deals cerrados este mes</div>
+            <div class="dash-goal-nums" id="dash-goal-deals-nums">0 / 2</div>
+          </div>
+          <div class="progress-wrap"><div class="progress-fill" id="dash-goal-deals-bar" style="width:0%;background:linear-gradient(90deg,var(--blue),#60a5fa)"></div></div>
+          <div class="dash-goal-meta">
+            <div class="dash-goal-pct" id="dash-goal-deals-pct">0% del objetivo</div>
+            <div class="dash-goal-rem" id="dash-goal-deals-rem">Faltan 2</div>
+          </div>
         </div>
       </div>
+
+      <!-- Top Clientes -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="sec-label">Top clientes</div>
+        <div id="dash-top-clients"><div style="font-size:12px;color:var(--txt3)">Sin clientes activos</div></div>
+      </div>
+
+      <!-- Pipeline por etapa -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="sec-label">Pipeline por etapa</div>
+        <div id="dash-pipeline-stages"><div style="font-size:12px;color:var(--txt3)">Sin prospectos</div></div>
+      </div>
+
+      <!-- Acciones rápidas (4) -->
+      <div class="qa-grid" style="margin-bottom:12px">
+        <div class="qa-btn" onclick="quickAction('task')"><div class="qa-icon">✅</div><div class="qa-label">Tarea</div></div>
+        <div class="qa-btn" onclick="quickAction('prospect')"><div class="qa-icon">🎯</div><div class="qa-label">Prospecto</div></div>
+        <div class="qa-btn" onclick="quickAction('ai-proposal')"><div class="qa-icon">🤖</div><div class="qa-label">Propuesta</div></div>
+        <div class="qa-btn" onclick="quickAction('income')"><div class="qa-icon">💰</div><div class="qa-label">Ingreso</div></div>
+      </div>
+
       <!-- Alerts -->
       <div id="alerts-section"></div>
-      <!-- Quick Actions -->
-      <div class="sec-label" style="margin-bottom:10px">Acciones rápidas</div>
-      <div class="qa-grid">
-        <div class="qa-btn" onclick="quickAction('task')"><div class="qa-icon">✅</div><div class="qa-label">Nueva tarea</div></div>
-        <div class="qa-btn" onclick="quickAction('prospect')"><div class="qa-icon">🎯</div><div class="qa-label">Prospecto</div></div>
-        <div class="qa-btn" onclick="quickAction('ai-proposal')"><div class="qa-icon">🤖</div><div class="qa-label">Propuesta AI</div></div>
-        <div class="qa-btn" onclick="quickAction('script')"><div class="qa-icon">🎬</div><div class="qa-label">Script MAX</div></div>
-        <div class="qa-btn" onclick="quickAction('note')"><div class="qa-icon">📝</div><div class="qa-label">Anotar idea</div></div>
-        <div class="qa-btn" onclick="quickAction('income')"><div class="qa-icon">💰</div><div class="qa-label">Ingreso</div></div>
-        <div class="qa-btn" onclick="quickAction('focus')"><div class="qa-icon">🎯</div><div class="qa-label">Modo Focus</div></div>
-        <div class="qa-btn" onclick="quickAction('copy')"><div class="qa-icon">✍️</div><div class="qa-label">Copy AI</div></div>
+
+      <!-- Brief del día -->
+      <div id="morning-brief" class="card" style="border-color:rgba(124,58,237,.2);background:linear-gradient(135deg,rgba(124,58,237,.06),rgba(168,85,247,.02));margin-bottom:12px">
+        <div class="sec-label">Brief del día</div>
+        <div id="brief-content" style="font-size:13px;line-height:1.8;color:var(--txt2)">Cargando...</div>
       </div>
-      <!-- Today -->
+
+      <!-- Agenda de hoy -->
       <div class="sec-label">Agenda de hoy</div>
       <div id="today-list">
         <div class="empty"><div class="empty-icon">📅</div>Sin tareas para hoy</div>
       </div>
+
       <!-- Follow-up radar -->
       <div id="radar-section"></div>
     </div>
@@ -1409,14 +1498,34 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
       <div class="modal-handle"></div>
       <div class="modal-title">⚙️ Configuración rápida</div>
       <div class="field"><label>Proxy Claude (localhost)</label><input type="text" id="cfg-proxy-quick" placeholder="http://localhost:3001/chat"></div>
+      <div class="field"><label>Admin Token</label><input type="password" id="cfg-admin-token" placeholder="Bearer token del servidor..." autocomplete="off"></div>
       <button class="btn btn-primary btn-full" style="margin-bottom:8px" onclick="saveSettingsQuick()">Guardar</button>
-      <div class="sec-label" style="margin-top:12px">Importar datos de OS</div>
+      <div class="sec-label" style="margin-top:12px">Backup servidor</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="exportServerData()">⬇ Exportar HQ data</button>
+        <button class="btn btn-ghost btn-sm" style="flex:1" onclick="importServerData()">⬆ Importar HQ data</button>
+      </div>
+      <div class="sec-label" style="margin-top:4px">Importar datos de OS</div>
       <textarea id="import-json-quick" placeholder="Pegá el JSON de Concepto OS..." style="min-height:70px;margin-bottom:8px;font-size:12px;font-family:'DM Mono',monospace"></textarea>
       <div style="display:flex;gap:8px;margin-bottom:8px">
         <button class="btn btn-primary btn-full" onclick="importFromJSON('quick')">⬇ Importar JSON</button>
         <label class="btn btn-ghost" style="flex:1;text-align:center;cursor:pointer">📂 Archivo<input type="file" accept=".json" onchange="importFromFile(event)" style="display:none"></label>
       </div>
       <div style="margin-top:8px;font-size:11px;color:var(--txt3);font-family:'DM Mono',monospace;text-align:center">Concepto HQ v1.0</div>
+    </div>
+  </div>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal">
+    <div id="auth-modal-box">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:36px;margin-bottom:10px">🔒</div>
+        <div style="font-size:19px;font-weight:800;letter-spacing:-.5px;color:#e8e8f2">Token requerido</div>
+        <div style="font-size:13px;color:#9898b0;margin-top:6px;line-height:1.5">Ingresá tu ADMIN_TOKEN para acceder al servidor</div>
+      </div>
+      <input type="password" id="auth-token-input" placeholder="Token..." style="margin-bottom:14px;font-family:'DM Mono',monospace;letter-spacing:.05em" autocomplete="off" onkeydown="if(event.key==='Enter')submitAuthToken()">
+      <button onclick="submitAuthToken()" style="width:100%;padding:13px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',system-ui;box-shadow:0 6px 24px rgba(124,58,237,.28);letter-spacing:-.2px">Conectar</button>
+      <div style="text-align:center;margin-top:14px;font-size:11px;font-family:'DM Mono',monospace;color:#55556a">Configurá ADMIN_TOKEN en Railway → Variables</div>
     </div>
   </div>
 
@@ -1465,6 +1574,8 @@ function load() {
   if(!D.focus) D.focus={sessions:[]};
   if(!D.settings) D.settings={proxy:'',userName:'Bruno'};
   if(!D.mktStatus) D.mktStatus={};
+  if(!D.mrrTarget) D.mrrTarget=2500;
+  if(!D.dealTarget) D.dealTarget=2;
   checkDayReset();
 }
 let _syncTimer = null;
@@ -1778,27 +1889,136 @@ function renderRadar() {
 }
 
 // ── COMANDO RENDER ────────────────────────────────
+// ── DASHBOARD HELPERS ─────────────────────────────
+function getDashMrrMonthly() {
+  const now=new Date();
+  const months=[];
+  for(let i=5;i>=0;i--) {
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=d.toISOString().slice(0,7);
+    const label=d.toLocaleString('es-UY',{month:'short'}).replace('.','');
+    months.push({key,label,val:0});
+  }
+  (D.finances.income||[]).forEach(item=>{
+    if(!item.date) return;
+    const key=item.date.slice(0,7);
+    const m=months.find(x=>x.key===key);
+    if(m) m.val+=(Number(item.amount)||0);
+  });
+  return months;
+}
+function renderDashMrrChart() {
+  const svg=document.getElementById('dash-mrr-svg');
+  const labelsEl=document.getElementById('dash-mrr-labels');
+  if(!svg) return;
+  const months=getDashMrrMonthly();
+  const vals=months.map(m=>m.val);
+  const W=320,H=88,padX=4,padY=10;
+  const maxV=Math.max(...vals,1);
+  const n=vals.length;
+  const xStep=(W-padX*2)/(n-1);
+  const pts=vals.map((v,i)=>{
+    const x=padX+i*xStep;
+    const y=H-padY-((v/maxV)*(H-padY*2));
+    return [x,y];
+  });
+  let d=`M ${pts[0][0]} ${pts[0][1]}`;
+  for(let i=1;i<pts.length;i++){
+    const cp1x=pts[i-1][0]+xStep*0.4,cp1y=pts[i-1][1];
+    const cp2x=pts[i][0]-xStep*0.4,cp2y=pts[i][1];
+    d+=` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i][0]} ${pts[i][1]}`;
+  }
+  const areaD=d+` L ${pts[n-1][0]} ${H} L ${pts[0][0]} ${H} Z`;
+  const hasData=vals.some(v=>v>0);
+  svg.innerHTML=`<defs>
+    <linearGradient id="dash-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7c3aed" stop-opacity="${hasData?'0.35':'0.1'}"/>
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <path d="${areaD}" fill="url(#dash-grad)"/>
+  <path d="${d}" fill="none" stroke="${hasData?'#a855f7':'var(--border2)'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  ${vals.map((v,i)=>v>0?`<circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="3" fill="#a855f7"/>`:``).join('')}`;
+  if(labelsEl) labelsEl.innerHTML=months.map(m=>`<div style="font-size:10px;color:var(--txt3);font-family:'DM Mono',monospace">${m.label}</div>`).join('');
+}
+function renderDashGoals(mrr) {
+  const target=D.mrrTarget||2500;
+  const pct=Math.min(Math.round((mrr/target)*100),100);
+  const rem=Math.max(target-mrr,0);
+  document.getElementById('dash-goal-mrr-nums').textContent='$'+mrr.toLocaleString()+' / $'+target.toLocaleString();
+  document.getElementById('dash-goal-mrr-bar').style.width=pct+'%';
+  document.getElementById('dash-goal-mrr-pct').textContent=pct+'% del objetivo';
+  document.getElementById('dash-goal-mrr-rem').textContent=rem>0?'Faltan $'+rem.toLocaleString():'✓ Objetivo cumplido';
+  const thisMonth=new Date().toISOString().slice(0,7);
+  const closed=(D.pipeline||[]).filter(p=>p.stage==='cerrado'&&p.updatedAt&&p.updatedAt.slice(0,7)===thisMonth).length;
+  const dealTarget=D.dealTarget||2;
+  const dealPct=Math.min(Math.round((closed/dealTarget)*100),100);
+  document.getElementById('dash-goal-deals-nums').textContent=closed+' / '+dealTarget;
+  document.getElementById('dash-goal-deals-bar').style.width=dealPct+'%';
+  document.getElementById('dash-goal-deals-pct').textContent=dealPct+'% del objetivo';
+  const dealRem=Math.max(dealTarget-closed,0);
+  document.getElementById('dash-goal-deals-rem').textContent=dealRem>0?'Faltan '+dealRem:'✓ Objetivo cumplido';
+}
+function renderDashTopClients(clients) {
+  const el=document.getElementById('dash-top-clients');
+  if(!el) return;
+  const sorted=[...clients].sort((a,b)=>(Number(b.fee)||0)-(Number(a.fee)||0)).slice(0,5);
+  if(!sorted.length){el.innerHTML='<div style="font-size:12px;color:var(--txt3)">Sin clientes activos</div>';return;}
+  el.innerHTML=sorted.map(c=>`<div class="dash-client-row" onclick="setPage('clients')">
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+      ${c.service?`<div style="font-size:11px;color:var(--txt3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.service}</div>`:''}
+    </div>
+    <div style="font-size:14px;font-weight:800;color:var(--green);flex-shrink:0">$${(Number(c.fee)||0).toLocaleString()}</div>
+  </div>`).join('');
+}
+function renderDashPipelineStages() {
+  const el=document.getElementById('dash-pipeline-stages');
+  if(!el) return;
+  const active=(D.pipeline||[]).filter(p=>p.stage!=='cerrado'&&p.stage!=='perdido');
+  if(!active.length){el.innerHTML='<div style="font-size:12px;color:var(--txt3)">Sin prospectos activos</div>';return;}
+  const stages=[
+    {key:'prospecto',label:'Prospecto',color:'var(--txt3)'},
+    {key:'contactado',label:'Contactado',color:'var(--blue)'},
+    {key:'propuesta',label:'Propuesta',color:'var(--orange)'},
+    {key:'negociacion',label:'Negociación',color:'var(--yellow)'}
+  ];
+  const counts=stages.map(s=>active.filter(p=>p.stage===s.key).length);
+  const maxCount=Math.max(...counts,1);
+  el.innerHTML=stages.map((s,i)=>{
+    const count=counts[i];
+    const w=Math.round((count/maxCount)*100);
+    return `<div class="dash-stage-row">
+      <div class="dash-stage-label" style="color:${s.color}">${s.label}</div>
+      <div class="dash-stage-bar-wrap"><div class="dash-stage-bar-fill" style="width:${Math.max(w,count>0?8:0)}%;background:${s.color}"></div></div>
+      <div class="dash-stage-count" style="color:${s.color}">${count}</div>
+    </div>`;
+  }).join('');
+}
 function renderComando() {
   buildBrief();
   renderAlerts();
   renderTodayAgenda();
   renderRadar();
-  loadEnergyToday();
-  // KPIs
   const clients=D.clients.filter(c=>c.status==='activo');
   const mrr=clients.reduce((s,c)=>s+(Number(c.fee)||0),0);
   const pipeline=D.pipeline.filter(p=>p.stage!=='cerrado'&&p.stage!=='perdido');
   const pipelineVal=pipeline.reduce((s,p)=>s+(Number(p.value)||0),0);
   const pendingTasks=D.tasks.filter(t=>!t.done);
+  const published=Object.values(D.mktStatus||{}).filter(v=>v==='publicada').length;
   document.getElementById('kpi-mrr').textContent='$'+mrr.toLocaleString();
   document.getElementById('kpi-mrr-sub').textContent=clients.length+' cliente'+(clients.length!==1?'s':'')+' activo'+(clients.length!==1?'s':'');
   document.getElementById('kpi-pipeline').textContent='$'+pipelineVal.toLocaleString();
   document.getElementById('kpi-pipeline-sub').textContent=pipeline.length+' prospectos';
+  document.getElementById('kpi-clients').textContent=clients.length;
+  document.getElementById('kpi-clients-sub').textContent=mrr>0?'$'+mrr.toLocaleString()+'/mes':'sin MRR';
   document.getElementById('kpi-tasks').textContent=pendingTasks.length;
   document.getElementById('kpi-tasks-sub').textContent=pendingTasks.filter(t=>t.due===todayStr()).length+' para hoy';
-  // Timer this week
-  const weekSecs=getWeekSeconds();
-  document.getElementById('kpi-timer').textContent=Math.floor(weekSecs/3600)+'h '+(Math.floor((weekSecs%3600)/60))+'m';
+  document.getElementById('kpi-published').textContent=published;
+  renderDashMrrChart();
+  renderDashGoals(mrr);
+  renderDashTopClients(clients);
+  renderDashPipelineStages();
 }
 function getWeekSeconds() {
   const now=new Date(); const monday=new Date(now);
@@ -3128,8 +3348,8 @@ function setMktTab(tab, el) {
 async function loadIgAnalytics() {
   if(!serverOnline) return;
   try {
-    const res = await fetch('/api/instagram');
-    if(!res.ok) return;
+    const res = await apiFetch('/api/instagram');
+    if(!res || !res.ok) return;
     const ig = await res.json();
     if(!ig) return;
 
@@ -3191,8 +3411,8 @@ async function loadInstagramPage() {
     return;
   }
   try {
-    const res = await fetch('/api/instagram');
-    if(!res.ok) return;
+    const res = await apiFetch('/api/instagram');
+    if(!res || !res.ok) return;
     _igData = await res.json();
     renderInstagramPage(_igData);
   } catch(e) { console.error('IG page error', e); }
@@ -3428,6 +3648,8 @@ function saveSettings() {
 }
 function saveSettingsQuick() {
   D.settings.proxy=document.getElementById('cfg-proxy-quick').value.trim();
+  const t = document.getElementById('cfg-admin-token').value.trim();
+  if (t) setAuthToken(t);
   save(); closeModal('modal-settings'); notify('✅ Guardado');
 }
 function importFromJSON(src) {
@@ -3544,6 +3766,70 @@ document.addEventListener('DOMContentLoaded', init);
 const SERVER = 'http://localhost:3001';
 let serverOnline = false;
 
+// ── AUTH TOKEN ────────────────────────────────────────
+const AUTH_KEY = 'concepto-hq-token';
+function getAuthToken() { return localStorage.getItem(AUTH_KEY) || ''; }
+function setAuthToken(t) { if (t) localStorage.setItem(AUTH_KEY, t); }
+
+function showAuthModal() {
+  document.getElementById('auth-modal').classList.add('open');
+  setTimeout(() => document.getElementById('auth-token-input')?.focus(), 120);
+}
+function hideAuthModal() {
+  document.getElementById('auth-modal').classList.remove('open');
+}
+function submitAuthToken() {
+  const t = document.getElementById('auth-token-input').value.trim();
+  if (!t) return;
+  setAuthToken(t);
+  document.getElementById('auth-token-input').value = '';
+  hideAuthModal();
+  notify('✅ Token guardado — reintentá la acción');
+  checkServer();
+}
+
+async function apiFetch(path, options = {}) {
+  const token = getAuthToken();
+  const headers = { ...(options.headers || {}) };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  const r = await fetch(`${SERVER}${path}`, { ...options, headers });
+  if (r.status === 401) { showAuthModal(); return null; }
+  return r;
+}
+
+async function exportServerData() {
+  try {
+    const r = await apiFetch('/api/export');
+    if (!r) return;
+    const blob = await r.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `hq-data-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    notify('✅ Backup descargado');
+  } catch { notify('Error exportando datos del servidor'); }
+}
+
+async function importServerData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = async (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      const r = await apiFetch('/api/import', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      if (r && r.ok) notify('✅ Datos restaurados en el servidor');
+      else if (r) notify('Error al importar');
+    } catch { notify('JSON inválido'); }
+  };
+  input.click();
+}
+
 async function checkServer() {
   try {
     const r = await fetch(`${SERVER}/api/health`, {signal: AbortSignal.timeout(2000)});
@@ -3585,7 +3871,7 @@ function updateMktOfflineBanner() {
 async function syncToServer() {
   if (!serverOnline) return;
   try {
-    await fetch(`${SERVER}/api/data`, {
+    await apiFetch('/api/data', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify(D)
@@ -3600,11 +3886,12 @@ async function streamChat(messages, role, onChunk, onDone) {
     onDone(); return;
   }
   try {
-    const r = await fetch(`${SERVER}/api/chat`, {
+    const r = await apiFetch('/api/chat', {
       method: 'POST',
       headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ messages, role, data: D })
     });
+    if (!r) { onChunk('[Token requerido. Configurá el token en ⚙️]'); onDone(); return; }
     const reader = r.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
@@ -3771,8 +4058,8 @@ function clearMktChat() {
 async function loadTodayIdeas() {
   if (!serverOnline) return;
   try {
-    const r = await fetch(`${SERVER}/api/ideas`);
-    if (r.ok) {
+    const r = await apiFetch('/api/ideas');
+    if (r && r.ok) {
       const ideas = await r.json();
       if (ideas && ideas.length) renderAIIdeas(ideas);
     }
@@ -3786,12 +4073,12 @@ async function generateAIIdeas() {
   document.getElementById('ideas-ai-section').innerHTML =
     '<div class="card" style="text-align:center;padding:28px 16px;margin-bottom:12px"><div style="font-size:36px;margin-bottom:10px">🧠</div><div style="font-size:14px;color:var(--txt2)">MAX está analizando tu negocio...</div></div>';
   try {
-    const r = await fetch(`${SERVER}/api/ideas/generate`, {
+    const r = await apiFetch('/api/ideas/generate', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({data:D})
     });
-    if (r.ok) {
+    if (r && r.ok) {
       const ideas = await r.json();
       if (ideas && ideas.length) renderAIIdeas(ideas);
       else document.getElementById('ideas-ai-section').innerHTML = '<div class="card" style="text-align:center;padding:24px"><div style="color:var(--txt3)">No se pudieron generar ideas. Verificá la API key.</div></div>';
@@ -3843,12 +4130,12 @@ async function loadBrief() {
   buildBrief(); // Show static brief immediately
   if (!serverOnline) return;
   try {
-    const r = await fetch(`${SERVER}/api/brief`, {
+    const r = await apiFetch('/api/brief', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({data:D})
     });
-    if (r.ok) {
+    if (r && r.ok) {
       const {brief} = await r.json();
       if (brief) {
         const el = document.getElementById('brief-content');
