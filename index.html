@@ -1839,7 +1839,7 @@ function renderInfra(){
     ].join('');
     const open=p.url?`<a href="${p.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="flex:1;text-decoration:none;text-align:center">↗ Abrir</a>`:'';
     const mapBtn=`<button class="btn btn-ghost btn-sm" style="flex:1" onclick="var d=document.getElementById('imap-${i}');var o=d.style.display==='none';d.style.display=o?'block':'none';this.textContent=o?'✕ Ocultar':'🗺️ Ver mapeo';">🗺️ Ver mapeo</button>`;
-    const detail=`<div id="imap-${i}" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:4px">${meta}<div style="font-size:12px;color:var(--txt2);margin-top:8px"><b style="color:var(--vlt2)">Roadmap:</b> ${p.rm}</div></div>`;
+    const detail=`<div id="imap-${i}" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:4px">${meta}<div style="font-size:12px;color:var(--txt2);margin-top:8px"><b style="color:var(--vlt2)">Roadmap:</b> ${p.rm||'—'}</div></div>`;
     return `<div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <div style="font-weight:700;font-size:15px">${p.n}</div><span class="tag ${s[0]}">${s[1]}</span>
@@ -1849,13 +1849,16 @@ function renderInfra(){
       ${detail}
     </div>`;
   };
-  const groups={prod:[],dev:[],todo:[]};
+  const groups={};
   INFRA.forEach((p,i)=>{ (groups[p.st]||(groups[p.st]=[])).push(card(p,i)); });
+  const labels={prod:'🟢 Producción',dev:'🟡 En desarrollo',todo:'🔴 Pendiente'};
+  // orden conocido primero; cualquier estado no previsto se muestra igual (nunca perder un proyecto)
+  const order=['prod','dev','todo',...Object.keys(groups).filter(k=>!labels[k])];
   let html='';
-  [['prod','🟢 Producción'],['dev','🟡 En desarrollo'],['todo','🔴 Pendiente']].forEach(([k,label])=>{
+  order.forEach(k=>{
     const items=groups[k];
     if(!items||!items.length) return;
-    html+=`<div class="sec-label" style="margin-top:14px">${label} · ${items.length}</div>`+items.join('');
+    html+=`<div class="sec-label" style="margin-top:14px">${labels[k]||k} · ${items.length}</div>`+items.join('');
   });
   el.innerHTML=html;
 }
