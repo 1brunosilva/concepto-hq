@@ -267,7 +267,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     </div>
     <div id="header-right">
       <div id="header-date" style="font-size:12px;color:var(--txt3);font-family:'DM Mono',monospace"></div>
-      <div style="font-size:10px;color:var(--vlt2);font-family:'DM Mono',monospace;opacity:.8" title="versión">v5</div>
+      <div style="font-size:10px;color:var(--vlt2);font-family:'DM Mono',monospace;opacity:.8" title="versión">v6</div>
       <div id="sync-dot" title="Sincronizando..." style="width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:background .3s;flex-shrink:0"></div>
       <button class="hdr-btn" onclick="openModal('modal-settings');document.getElementById('cfg-admin-token').value=getAuthToken()" style="padding:6px 8px;font-size:16px;background:none;border:none">⚙️</button>
     </div>
@@ -4620,6 +4620,48 @@ async function loadBrief() {
     }
   } catch {}
 }
+</script>
+<!-- DIAG TEMPORAL -->
+<div id="diag" style="position:fixed;top:64px;left:8px;right:8px;z-index:99999;background:#16002e;border:1px solid #7c3aed;border-radius:10px;padding:10px;font:11px/1.45 ui-monospace,monospace;color:#fff;white-space:pre-wrap"></div>
+<script>
+(function(){
+  function measure(){
+    var probeB=document.createElement('div');
+    probeB.style.cssText='position:fixed;bottom:0;left:0;height:env(safe-area-inset-bottom,0px);width:1px;pointer-events:none';
+    document.body.appendChild(probeB);
+    var probeT=document.createElement('div');
+    probeT.style.cssText='position:fixed;top:0;left:0;height:env(safe-area-inset-top,0px);width:1px;pointer-events:none';
+    document.body.appendChild(probeT);
+    var sab=getComputedStyle(probeB).height, sat=getComputedStyle(probeT).height;
+    var nav=document.getElementById('nav');
+    var nr=nav?nav.getBoundingClientRect():{bottom:0,top:0,height:0};
+    var vv=window.visualViewport||{height:0};
+    var app=document.getElementById('app');
+    var ar=app?app.getBoundingClientRect():{bottom:0,height:0};
+    var lines=[
+      'DIAG v6',
+      'standalone(nav): '+window.navigator.standalone,
+      'standalone(mq): '+matchMedia('(display-mode: standalone)').matches,
+      'innerHeight: '+window.innerHeight,
+      'screen.height: '+window.screen.height,
+      'visualViewport.h: '+Math.round(vv.height),
+      'docClientH: '+document.documentElement.clientHeight,
+      'devicePixelRatio: '+window.devicePixelRatio,
+      'safe-area-bottom: '+sab,
+      'safe-area-top: '+sat,
+      'navRect.top: '+Math.round(nr.top),
+      'navRect.bottom: '+Math.round(nr.bottom),
+      'navRect.height: '+Math.round(nr.height),
+      'appRect.bottom: '+Math.round(ar.bottom),
+      'GAP innerH - navBottom: '+Math.round(window.innerHeight - nr.bottom),
+      'GAP screen - innerH: '+Math.round(window.screen.height - window.innerHeight)
+    ];
+    probeB.remove(); probeT.remove();
+    var el=document.getElementById('diag'); if(el) el.textContent=lines.join('\n');
+  }
+  if(document.readyState==='complete') measure(); else window.addEventListener('load',measure);
+  setTimeout(measure, 700);
+})();
 </script>
 </body>
 </html>
