@@ -1811,70 +1811,84 @@ function goToPage(p) {
 // ═══════════════ INFRAESTRUCTURA — inventario real (2026-06-08) ═══════════════
 const INFRA = [
   {n:'conceptodevelopment.com', t:'Sitio web de la empresa', st:'prod', url:'https://conceptodevelopment.com',
-   gh:'1brunosilva/Concepto-Robot', vc:'Vercel personal (bruneesilva)', host:'DNS: Cloudflare',
-   rm:'Migrar a empresa (se dejó intacto por seguridad — hacerlo en un momento dedicado).'},
+   gh:'1brunosilva/Concepto-Robot', ghA:'GitHub personal · 1brunosilva',
+   vc:'concepto-robot', vcA:'Vercel personal · bruneesilva@gmail.com',
+   host:'DNS en Cloudflare', hostA:'conceptodevelopment@gmail.com',
+   rm:'Migrar a empresa (se dejó intacto por seguridad).'},
   {n:'Concepto HQ', t:'App interna (esta app)', st:'prod', url:'https://concepto-hq.vercel.app',
-   gh:'Concepeto/concepto-hq', vc:'Vercel empresa', db:'concepto-hq (zngbeqbv…)',
-   rm:'Crear staging · mover su DB a org de empresa.'},
+   gh:'Concepeto/concepto-hq', ghA:'GitHub empresa · org Concepeto',
+   vc:'concepto-hq', vcA:'Vercel empresa · conceptodevelopment@gmail.com',
+   db:'concepto-hq', dbA:'Supabase bruneesilva@gmail.com · org escuela-naval',
+   rm:'Crear staging · mover la DB a una org de empresa.'},
   {n:'Escuela Naval', t:'PWA en producción', st:'prod', url:'https://escuela-naval.conceptodevelopment.workers.dev',
-   gh:'Concepeto/escuela-naval', host:'Cloudflare Worker', db:'escuela naval (ulwcjnzn…)',
+   gh:'Concepeto/escuela-naval', ghA:'GitHub empresa · org Concepeto',
+   host:'Cloudflare Worker', hostA:'conceptodevelopment@gmail.com',
+   db:'escuela naval', dbA:'Supabase bruneesilva@gmail.com · org escuela-naval',
    rm:'Ejecutar los 8 índices pendientes (INDEXES-PENDIENTES.sql).'},
   {n:'Barraca Uno HQ', t:'Sitio estático (en producción)', st:'prod', url:'https://barraca-uno-hq.vercel.app',
-   gh:'Concepeto/barraca-uno-hq', vc:'Vercel empresa',
+   gh:'Concepeto/barraca-uno-hq', ghA:'GitHub empresa · org Concepeto',
+   vc:'barraca-uno-hq', vcA:'Vercel empresa · conceptodevelopment@gmail.com',
    rm:'Reemplazar por la versión star cuando esté lista.'},
   {n:'Hotel Oxford', t:'Landing de cliente', st:'prod', url:'https://hotel-oxford.vercel.app',
-   gh:'Concepeto/hotel-oxford', vc:'Vercel empresa',
+   gh:'Concepeto/hotel-oxford', ghA:'GitHub empresa · org Concepeto',
+   vc:'hotel-oxford', vcA:'Vercel empresa · conceptodevelopment@gmail.com',
    rm:'Upsell: chatbot de reservas.'},
   {n:'MVD Trading', t:'Landing de cliente', st:'prod', url:'https://mvd-trading.vercel.app',
-   gh:'Concepeto/mvd-trading', vc:'Vercel empresa',
+   gh:'Concepeto/mvd-trading', ghA:'GitHub empresa · org Concepeto',
+   vc:'mvd-trading', vcA:'Vercel empresa · conceptodevelopment@gmail.com',
    rm:'Upsell: nurturing de leads.'},
   {n:'Fernando Estilista', t:'Landing de cliente', st:'prod', url:'',
-   gh:'1brunosilva/FernandoEstilista (legacy)', host:'WordPress + Elementor en tierxhosting',
+   gh:'1brunosilva/FernandoEstilista (legacy)', ghA:'GitHub personal · 1brunosilva',
+   host:'WordPress + Elementor', hostA:'tierxhosting · correo @conceptodevelopment.com',
    rm:'Upsell: chatbot de turnos.'},
   {n:'ShockBag (HAL)', t:'Agente de IA', st:'prod', url:'',
-   host:'n8n (brunoconcepto.app.n8n.cloud) + ManyChat',
+   host:'n8n + ManyChat', hostA:'brunoconcepto.app.n8n.cloud',
    rm:'Mejorar lógica de derivación.'},
   {n:'Barraca Uno (star)', t:'App nueva (Astro) — el proyecto grande', st:'dev', url:'https://barraca-uno-star.vercel.app',
-   gh:'conceptodevelopment-dev/barraca-uno-star', vc:'Vercel empresa', db:'barraca-prod + barraca-staging',
+   gh:'conceptodevelopment-dev/barraca-uno-star', ghA:'GitHub empresa · usuario conceptodevelopment-dev',
+   vc:'barraca-uno-star', vcA:'Vercel empresa · conceptodevelopment@gmail.com',
+   db:'barraca-prod + barraca-staging', dbA:'Supabase conceptodevelopment@gmail.com',
    rm:'Cutover: correr 0004_hardening.sql y reemplazar a barraca-uno-hq.'},
   {n:'Concepto Agentes', t:'Centro de mando de agentes', st:'dev', url:'',
-   gh:'Concepeto/concepto-agentes', db:'(Supabase, confirmar)',
+   gh:'Concepeto/concepto-agentes', ghA:'GitHub empresa · org Concepeto',
+   db:'(confirmar proyecto)', dbA:'Supabase',
    rm:'Terminar e integrar.'},
   {n:'Concepto Empresa', t:'Backup de docs/SOPs', st:'dev', url:'',
-   gh:'Concepeto/concepto-empresa',
+   gh:'Concepeto/concepto-empresa', ghA:'GitHub empresa · org Concepeto',
    rm:'Completar la subida (push quedó a medias).'},
   {n:'Pintelux LUCA', t:'Chatbot de cliente', st:'todo', url:'',
-   host:'n8n / ManyChat (sin empezar)',
+   host:'n8n / ManyChat (sin empezar)', hostA:'',
    rm:'🔴 Mes gratis acordado — arrancar implementación.'},
 ];
 function renderInfra(){
   const el=document.getElementById('infra-list'); if(!el) return;
   const stMap={prod:['tag-green','🟢 Producción'],dev:['tag-orange','🟡 Desarrollo'],todo:['tag-red','🔴 Pendiente']};
-  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:12px;font-size:12px;padding:2px 0"><span style="color:var(--txt3);white-space:nowrap">${k}</span><b style="color:var(--txt2);text-align:right">${v}</b></div>`;
-  const card=(p)=>{
+  const row=(k,v,sub)=>`<div style="padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;justify-content:space-between;gap:12px;font-size:12px"><span style="color:var(--txt3);white-space:nowrap">${k}</span><b style="color:var(--txt2);text-align:right">${v}</b></div>${sub?`<div style="text-align:right;font-size:10px;color:var(--txt3);font-family:'DM Mono',monospace;margin-top:1px">${sub}</div>`:''}</div>`;
+  const card=(p,i)=>{
     const s=stMap[p.st]||['tag-vlt',p.st];
     const meta=[
-      p.gh?row('GitHub',p.gh):'',
-      p.vc?row('Vercel',p.vc):'',
-      (p.db)?row('Supabase',p.db):'',
-      p.host?row('Host/DNS',p.host):'',
+      p.gh?row('GitHub',p.gh,p.ghA):'',
+      p.vc?row('Vercel',p.vc,p.vcA):'',
+      p.db?row('Supabase',p.db,p.dbA):'',
+      p.host?row('Host/DNS',p.host,p.hostA):'',
     ].join('');
-    const open=p.url?`<a href="${p.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm btn-full" style="text-decoration:none;margin-top:10px">↗ Abrir proyecto</a>`:`<div style="font-size:11px;color:var(--txt3);margin-top:10px">Sin URL web (servicio interno)</div>`;
+    const open=p.url?`<a href="${p.url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="flex:1;text-decoration:none;text-align:center">↗ Abrir</a>`:'';
+    const mapBtn=`<button class="btn btn-ghost btn-sm" style="flex:1" onclick="var d=document.getElementById('imap-${i}');var o=d.style.display==='none';d.style.display=o?'block':'none';this.textContent=o?'✕ Ocultar':'🗺️ Ver mapeo';">🗺️ Ver mapeo</button>`;
+    const detail=`<div id="imap-${i}" style="display:none;margin-top:8px;border-top:1px solid var(--border);padding-top:4px">${meta}<div style="font-size:12px;color:var(--txt2);margin-top:8px"><b style="color:var(--vlt2)">Roadmap:</b> ${p.rm}</div></div>`;
     return `<div class="card" style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:2px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
         <div style="font-weight:700;font-size:15px">${p.n}</div><span class="tag ${s[0]}">${s[1]}</span>
       </div>
-      <div style="font-size:12px;color:var(--txt3);margin-bottom:8px">${p.t}</div>
-      <div style="border-top:1px solid var(--border);padding-top:6px">${meta}</div>
-      <div style="font-size:12px;color:var(--txt2);margin-top:8px"><b style="color:var(--vlt2)">Roadmap:</b> ${p.rm}</div>
-      ${open}
+      <div style="font-size:12px;color:var(--txt3);margin:2px 0 8px">${p.t}</div>
+      <div style="display:flex;gap:6px">${open}${mapBtn}</div>
+      ${detail}
     </div>`;
   };
   let html='';
   [['prod','🟢 Producción'],['dev','🟡 En desarrollo'],['todo','🔴 Pendiente']].forEach(([k,label])=>{
     const items=INFRA.filter(p=>p.st===k);
     if(!items.length) return;
-    html+=`<div class="sec-label" style="margin-top:14px">${label} · ${items.length}</div>`+items.map(card).join('');
+    html+=`<div class="sec-label" style="margin-top:14px">${label} · ${items.length}</div>`+items.map(p=>card(p,INFRA.indexOf(p))).join('');
   });
   el.innerHTML=html;
 }
