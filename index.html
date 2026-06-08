@@ -27,7 +27,7 @@
 html,body{height:100%;background:var(--bg0);color:var(--txt1);font-family:'Inter',system-ui,sans-serif;font-size:15px;overflow:hidden}
 #app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative}
 /* SCROLL */
-#main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(var(--nav-h) + env(safe-area-inset-bottom,0px) + 16px)}
+#main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px calc(var(--nav-h) + var(--safe-b) + 16px)}
 /* PAGES */
 .page{display:none}.page.active{display:block}
 /* HEADER */
@@ -40,7 +40,7 @@ html,body{height:100%;background:var(--bg0);color:var(--txt1);font-family:'Inter
 #header-right{display:flex;gap:8px;align-items:center}
 .hdr-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-size:13px;color:var(--txt2);cursor:pointer;font-family:inherit}
 /* BOTTOM NAV */
-#nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));background:var(--bg0);border-top:1px solid var(--border);display:flex;align-items:center;padding-bottom:env(safe-area-inset-bottom,0px);z-index:50}
+#nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + var(--safe-b));background:rgba(7,7,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;padding-bottom:var(--safe-b);z-index:50}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:none;background:none;color:var(--txt3);cursor:pointer;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
 .nav-btn svg{width:22px;height:22px;transition:transform .15s}
 .nav-btn.active{color:var(--vlt2)}
@@ -267,7 +267,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     </div>
     <div id="header-right">
       <div id="header-date" style="font-size:12px;color:var(--txt3);font-family:'DM Mono',monospace"></div>
-      <div style="font-size:10px;color:var(--vlt2);font-family:'DM Mono',monospace;opacity:.8" title="versión">v7</div>
       <div id="sync-dot" title="Sincronizando..." style="width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:background .3s;flex-shrink:0"></div>
       <button class="hdr-btn" onclick="openModal('modal-settings');document.getElementById('cfg-admin-token').value=getAuthToken()" style="padding:6px 8px;font-size:16px;background:none;border:none">⚙️</button>
     </div>
@@ -840,11 +839,6 @@ Decime qué querés lograr — no me cuentes el proceso, contame el objetivo. Yo
     </div>
 
     <!-- ═══════════════ PROYECTOS ═══════════════ -->
-    <div id="page-projects" class="page">
-      <div class="page-title">Proyectos</div>
-      <button class="btn btn-primary btn-full" style="margin-bottom:14px" onclick="newProject()">+ Nuevo proyecto</button>
-      <div id="projects-groups"></div>
-    </div>
 
     <!-- ═══════════════ INFRAESTRUCTURA ═══════════════ -->
     <div id="page-infra" class="page">
@@ -1412,35 +1406,6 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
   </div>
 
   <!-- MODAL: PROYECTO -->
-  <div id="modal-project" class="modal-overlay">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <div class="modal-title" id="modal-project-title">Nuevo proyecto</div>
-      <input type="hidden" id="pr-edit-id">
-      <div class="field"><label>Nombre del proyecto *</label><input type="text" id="pr-name" placeholder="ej: App Barraca Uno Star"></div>
-      <div class="field"><label>Cliente / Para quién</label><input type="text" id="pr-client" placeholder="ej: Barraca Uno (o propio)"></div>
-      <div class="grid2" style="gap:8px">
-        <div class="field" style="margin:0"><label>Estado</label>
-          <select id="pr-status">
-            <option value="pendiente">⚪ Pendiente</option>
-            <option value="proceso">🟡 En proceso</option>
-            <option value="avanzado">🔵 Avanzado</option>
-            <option value="terminado">🟢 Terminado</option>
-          </select>
-        </div>
-        <div class="field" style="margin:0;display:flex;flex-direction:column;justify-content:flex-end"><label>&nbsp;</label><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2)"><input type="checkbox" id="pr-delivered" style="width:auto"> Entregado al cliente</label></div>
-      </div>
-      <div class="field"><label>🔗 Link a la app (URL en vivo)</label><input type="url" id="pr-url" placeholder="https://..."></div>
-      <div class="field"><label>🌐 Dónde vive</label><input type="text" id="pr-host" placeholder="ej: Vercel (cuenta 1brunosilva) vía GitHub"></div>
-      <div class="field"><label>🔑 Cuentas usadas</label><input type="text" id="pr-accounts" placeholder="ej: GitHub 1brunosilva · Vercel bruno@mail.com · Supabase ..."></div>
-      <div class="field"><label>🛠 Herramientas / stack</label><input type="text" id="pr-tools" placeholder="ej: Next.js, Supabase, Tailwind, n8n"></div>
-      <div class="field"><label>Notas</label><textarea id="pr-notes" style="min-height:60px" placeholder="Estado, pendientes, lo que prometiste..."></textarea></div>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-ghost" style="flex:1" onclick="closeModal('modal-project')">Cancelar</button>
-        <button class="btn btn-primary" style="flex:2" onclick="saveProject()">Guardar</button>
-      </div>
-    </div>
-  </div>
 
   <!-- MODAL: BÓVEDA -->
   <div id="modal-vault" class="modal-overlay">
@@ -1778,11 +1743,11 @@ function notify(msg, duration=2500) {
 // ── NAVIGATION ─────────────────────────────────────
 const PAGES = ['comando','ai','socio','pipeline','clients','tasks','focus','timer','finance',
                'contenido','propuestas','recursos','ideas','goals','notes','calc','settings','marketing','instagram',
-               'projects','vault','clientdetail','infra'];
+               'vault','clientdetail','infra'];
 const NAV_MAP = {
   comando:'nav-comando',
   clients:'nav-clients', clientdetail:'nav-clients',
-  projects:'nav-projects', infra:'nav-projects',
+  infra:'nav-projects',
   pipeline:'nav-ventas', propuestas:'nav-ventas',
   ai:'nav-more', socio:'nav-more', marketing:'nav-more', ideas:'nav-more',
   finance:'nav-more', tasks:'nav-more', focus:'nav-more', timer:'nav-more', goals:'nav-more',
@@ -1884,11 +1849,13 @@ function renderInfra(){
       ${detail}
     </div>`;
   };
+  const groups={prod:[],dev:[],todo:[]};
+  INFRA.forEach((p,i)=>{ (groups[p.st]||(groups[p.st]=[])).push(card(p,i)); });
   let html='';
   [['prod','🟢 Producción'],['dev','🟡 En desarrollo'],['todo','🔴 Pendiente']].forEach(([k,label])=>{
-    const items=INFRA.filter(p=>p.st===k);
-    if(!items.length) return;
-    html+=`<div class="sec-label" style="margin-top:14px">${label} · ${items.length}</div>`+items.map(p=>card(p,INFRA.indexOf(p))).join('');
+    const items=groups[k];
+    if(!items||!items.length) return;
+    html+=`<div class="sec-label" style="margin-top:14px">${label} · ${items.length}</div>`+items.join('');
   });
   el.innerHTML=html;
 }
@@ -1911,7 +1878,6 @@ function renderPage(p) {
   else if(p==='settings') loadSettings();
   else if(p==='marketing') renderMarketing();
   else if(p==='instagram') loadInstagramPage();
-  else if(p==='projects') renderProjects();
   else if(p==='vault') renderVault();
   else if(p==='clientdetail') renderClientDetail();
   else if(p==='infra') renderInfra();
@@ -2774,71 +2740,6 @@ function toggleClientTask(id) {
 }
 
 // ── PROYECTOS ─────────────────────────────────────
-const PROJ_STATUS={pendiente:{label:'⚪ Pendiente',color:'var(--txt3)'},proceso:{label:'🟡 En proceso',color:'var(--orange)'},avanzado:{label:'🔵 Avanzado',color:'var(--vlt2)'},terminado:{label:'🟢 Terminado',color:'var(--green)'}};
-const PROJ_ORDER=['proceso','avanzado','pendiente','terminado'];
-function renderProjects() {
-  const el=document.getElementById('projects-groups');
-  if(!D.projects.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📁</div>Sin proyectos todavía</div>'; return; }
-  let html='';
-  PROJ_ORDER.forEach(st=>{
-    const list=D.projects.filter(p=>(p.status||'pendiente')===st);
-    if(!list.length) return;
-    html+=`<div class="sec-label" style="margin-top:14px;color:${PROJ_STATUS[st].color}">${PROJ_STATUS[st].label} · ${list.length}</div>`;
-    html+=list.map(p=>{
-      const delivered=p.delivered;
-      return `<div class="card" style="margin-bottom:10px">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div style="flex:1"><div style="font-size:16px;font-weight:800">${esc(p.name)}</div>
-          ${p.client?`<div style="font-size:12px;color:var(--txt3)">👤 ${esc(p.client)}</div>`:''}</div>
-          <span class="tag ${delivered?'tag-green':'tag-gray'}" style="white-space:nowrap">${delivered?'✓ Entregado':'No entregado'}</span>
-        </div>
-        ${p.url?`<a href="${esc(p.url)}" target="_blank" rel="noopener" class="btn btn-primary btn-full btn-sm" style="margin-top:10px;text-decoration:none;display:block;text-align:center">🔗 Abrir app</a>`:''}
-        ${p.host?`<div style="font-size:12px;color:var(--txt2);margin-top:8px">🌐 <b>Vive en:</b> ${esc(p.host)}</div>`:''}
-        ${p.accounts?`<div style="font-size:12px;color:var(--txt2);margin-top:4px">🔑 <b>Cuentas:</b> ${esc(p.accounts)}</div>`:''}
-        ${p.tools?`<div style="font-size:12px;color:var(--txt2);margin-top:4px">🛠 <b>Herramientas:</b> ${esc(p.tools)}</div>`:''}
-        ${p.notes?`<div style="font-size:12px;color:var(--txt3);margin-top:6px;white-space:pre-wrap">${esc(p.notes)}</div>`:''}
-        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn btn-ghost btn-sm" onclick="editProject('${p.id}')">✏️ Editar</button>
-          <button class="btn btn-ghost btn-sm" onclick="deleteProject('${p.id}')">🗑</button>
-        </div>
-      </div>`;
-    }).join('');
-  });
-  el.innerHTML=html;
-}
-function newProject(){ document.getElementById('pr-edit-id').value=''; document.getElementById('modal-project-title').textContent='Nuevo proyecto'; ['pr-name','pr-client','pr-url','pr-host','pr-accounts','pr-tools','pr-notes'].forEach(id=>document.getElementById(id).value=''); document.getElementById('pr-status').value='proceso'; document.getElementById('pr-delivered').checked=false; openModal('modal-project'); }
-function editProject(id){
-  const p=D.projects.find(x=>x.id===id); if(!p) return;
-  document.getElementById('pr-edit-id').value=id;
-  document.getElementById('modal-project-title').textContent='Editar proyecto';
-  document.getElementById('pr-name').value=p.name||'';
-  document.getElementById('pr-client').value=p.client||'';
-  document.getElementById('pr-url').value=p.url||'';
-  document.getElementById('pr-host').value=p.host||'';
-  document.getElementById('pr-accounts').value=p.accounts||'';
-  document.getElementById('pr-tools').value=p.tools||'';
-  document.getElementById('pr-notes').value=p.notes||'';
-  document.getElementById('pr-status').value=p.status||'proceso';
-  document.getElementById('pr-delivered').checked=!!p.delivered;
-  openModal('modal-project');
-}
-function saveProject(){
-  const id=document.getElementById('pr-edit-id').value||uid();
-  const obj={id,name:document.getElementById('pr-name').value.trim(),
-    client:document.getElementById('pr-client').value.trim(),
-    url:document.getElementById('pr-url').value.trim(),
-    host:document.getElementById('pr-host').value.trim(),
-    accounts:document.getElementById('pr-accounts').value.trim(),
-    tools:document.getElementById('pr-tools').value.trim(),
-    notes:document.getElementById('pr-notes').value.trim(),
-    status:document.getElementById('pr-status').value,
-    delivered:document.getElementById('pr-delivered').checked};
-  if(!obj.name) return notify('El nombre es obligatorio');
-  const idx=D.projects.findIndex(p=>p.id===id);
-  if(idx>=0) D.projects[idx]=obj; else D.projects.push(obj);
-  save(); closeModal('modal-project'); renderProjects(); notify('✅ Proyecto guardado');
-}
-function deleteProject(id){ if(!confirm('¿Eliminar este proyecto?')) return; D.projects=D.projects.filter(p=>p.id!==id); save(); renderProjects(); }
 
 // ── BÓVEDA (PIN + encriptado AES-GCM en reposo) ───
 let vaultKey = null; // CryptoKey en memoria mientras está desbloqueada
