@@ -25,7 +25,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;background:var(--bg0);color:var(--txt1);font-family:'Inter',system-ui,sans-serif;font-size:15px;overflow:hidden}
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh;position:relative}
+#app{display:flex;flex-direction:column;height:100vh;height:100svh;position:relative}
 /* SCROLL */
 #main{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:16px 16px 16px}
 /* PAGES */
@@ -40,7 +40,7 @@ html,body{height:100%;background:var(--bg0);color:var(--txt1);font-family:'Inter
 #header-right{display:flex;gap:8px;align-items:center}
 .hdr-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:6px 10px;font-size:13px;color:var(--txt2);cursor:pointer;font-family:inherit}
 /* BOTTOM NAV */
-#nav{flex-shrink:0;height:calc(var(--nav-h) + max(2px, var(--safe-b) - 26px));background:rgba(7,7,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;padding-bottom:max(2px, var(--safe-b) - 26px);z-index:50}
+#nav{flex-shrink:0;height:var(--nav-h);background:rgba(7,7,10,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;align-items:center;z-index:50}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:none;background:none;color:var(--txt3);cursor:pointer;font-size:10px;font-family:'DM Mono',monospace;letter-spacing:.5px;text-transform:uppercase;transition:color .15s}
 .nav-btn svg{width:22px;height:22px;transition:transform .15s}
 .nav-btn.active{color:var(--vlt2)}
@@ -267,6 +267,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
     </div>
     <div id="header-right">
       <div id="header-date" style="font-size:12px;color:var(--txt3);font-family:'DM Mono',monospace"></div>
+      <div style="font-size:10px;color:var(--vlt2);font-family:'DM Mono',monospace;opacity:.8" title="versión">v4</div>
       <div id="sync-dot" title="Sincronizando..." style="width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:background .3s;flex-shrink:0"></div>
       <button class="hdr-btn" onclick="openModal('modal-settings');document.getElementById('cfg-admin-token').value=getAuthToken()" style="padding:6px 8px;font-size:16px;background:none;border:none">⚙️</button>
     </div>
