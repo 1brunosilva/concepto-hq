@@ -1609,8 +1609,25 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
     </div>
   </div>
 
+  <!-- LOGIN SEGURO (Supabase Auth) — protege la data en la nube vía RLS -->
+  <div id="login-overlay" style="position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(6,6,12,.96);backdrop-filter:blur(10px)">
+    <div style="background:#0b0b12;border:1px solid #23232e;border-radius:18px;padding:32px 26px;width:min(380px,calc(100vw - 32px));font-family:'Inter',system-ui">
+      <div style="text-align:center;margin-bottom:22px">
+        <div style="font-size:34px;margin-bottom:8px">🔐</div>
+        <div style="font-size:20px;font-weight:800;letter-spacing:-.5px;color:#e8e8f2">Concepto HQ</div>
+        <div style="font-size:13px;color:#9898b0;margin-top:6px;line-height:1.5">Entrá con tu mail para ver tus datos</div>
+      </div>
+      <input type="email" id="login-email" placeholder="tu@mail.com" autocomplete="username" style="width:100%;padding:12px;border-radius:10px;background:#15151f;border:1px solid #2a2a35;color:#e8e8f2;font-size:14px;margin-bottom:10px" onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
+      <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" style="width:100%;padding:12px;border-radius:10px;background:#15151f;border:1px solid #2a2a35;color:#e8e8f2;font-size:14px;margin-bottom:14px" onkeydown="if(event.key==='Enter')doLogin()">
+      <button onclick="doLogin()" id="login-btn" style="width:100%;padding:13px;border-radius:100px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',system-ui;box-shadow:0 6px 24px rgba(124,58,237,.28)">Entrar</button>
+      <div id="login-msg" style="text-align:center;margin-top:12px;font-size:12px;color:#e0666f;min-height:16px"></div>
+      <div style="text-align:center;margin-top:8px"><a href="#" onclick="skipLogin();return false" style="font-size:11px;color:#55556a;font-family:'DM Mono',monospace;text-decoration:none">seguir sin conectar (solo este dispositivo)</a></div>
+    </div>
+  </div>
+
 </div><!-- /app -->
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.min.js"></script>
 <script>
 // ══════════════════════════════════════════════════
 // CONCEPTO HQ — JavaScript Engine
@@ -1618,8 +1635,11 @@ Puedo generarte copy listo para usar, ideas de reels, análisis de qué funciona
 const KEY = 'concepto-hq-v1';
 const OS_KEY = 'concepto-os-v3';
 const SB_URL = 'https://zngbeqbvmbxeweldmyaf.supabase.co';
-const SB_KEY = 'sb_publishable_nNQhjFQGR4n8FuSLCjOA0Q_2FsgmXUA';
-const SB_ROW = 'bruno';
+const SB_KEY = 'sb_publishable_nNQhjFQGR4n8FuSLCjOA0Q_2FsgmXUA'; // publishable: segura CON RLS+Auth
+// Cliente con sesión (mete el JWT del usuario solo, RLS aplica). Si la librería no
+// cargó (offline/CDN caído), sb=null y la app sigue andando solo-local (red de seguridad).
+const sb = (window.supabase && window.supabase.createClient) ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+let currentUser = null;
 
 let D = {
   timer:{running:false,startedAt:null,todaySeconds:0,lastDate:'',logs:[]},
@@ -1679,42 +1699,66 @@ function setSyncStatus(s) {
   el.style.background = s==='ok'?'var(--green)':s==='syncing'?'var(--orange)':'var(--red)';
   el.title = s==='ok'?'Sincronizado ✓':s==='syncing'?'Sincronizando...':'Sin conexión';
 }
+// Sync a la nube: SOLO si hay sesión iniciada. La data se guarda por user_id y
+// RLS deja que cada usuario vea/edite solo lo suyo. Sin login -> solo localStorage.
 async function syncToSupabase() {
+  if(!sb || !currentUser) return;
   setSyncStatus('syncing');
   try {
-    const r=await fetch(`${SB_URL}/rest/v1/hq_data`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,'Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({id:SB_ROW,payload:D,updated_at:new Date().toISOString()})
-    });
-    setSyncStatus(r.ok?'ok':'error');
-  } catch{ setSyncStatus('error'); }
+    const { error } = await sb.from('hq_data')
+      .upsert({ user_id: currentUser.id, payload: D, updated_at: new Date().toISOString() }, { onConflict: 'user_id' });
+    setSyncStatus(error ? 'error' : 'ok');
+  } catch { setSyncStatus('error'); }
 }
 async function loadFromSupabase() {
+  if(!sb || !currentUser) return false;
   try {
-    const r=await fetch(`${SB_URL}/rest/v1/hq_data?id=eq.${SB_ROW}&select=payload`,{
-      headers:{'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`}
-    });
-    const rows=await r.json();
-    if(rows&&rows[0]&&rows[0].payload) {
-      const remote=rows[0].payload;
-      const proxy=D.settings?.proxy||'';
-      D=Object.assign({},D,remote);
-      if(proxy) D.settings.proxy=proxy;
-      if(!D.finances) D.finances={income:[],expenses:[]};
-      if(!D.proposals) D.proposals=[];
-      if(!D.contentItems) D.contentItems=[];
-      if(!D.quickPrompts) D.quickPrompts=[];
-      if(!D.energy) D.energy=[];
-      if(!D.focus) D.focus={sessions:[]};
-      if(!D.settings) D.settings={proxy:'',userName:'Bruno'};
-      localStorage.setItem(KEY,JSON.stringify(D));
-      setSyncStatus('ok');
-      return true;
-    }
-  } catch{ setSyncStatus('error'); }
-  return false;
+    const { data, error } = await sb.from('hq_data').select('payload').eq('user_id', currentUser.id).maybeSingle();
+    if(error || !data || !data.payload) return false;
+    const remote=data.payload;
+    const proxy=D.settings?.proxy||'';
+    D=Object.assign({},D,remote);
+    if(proxy) D.settings.proxy=proxy;
+    if(!D.finances) D.finances={income:[],expenses:[]};
+    if(!D.proposals) D.proposals=[];
+    if(!D.contentItems) D.contentItems=[];
+    if(!D.quickPrompts) D.quickPrompts=[];
+    if(!D.energy) D.energy=[];
+    if(!D.focus) D.focus={sessions:[]};
+    if(!D.settings) D.settings={proxy:'',userName:'Bruno'};
+    localStorage.setItem(KEY,JSON.stringify(D));
+    setSyncStatus('ok');
+    return true;
+  } catch { setSyncStatus('error'); return false; }
 }
+// ── LOGIN SEGURO ──────────────────────────────────
+async function bootAuth(){
+  if(!sb) return;                       // sin librería -> solo local
+  try{
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){ currentUser = session.user; return; }
+    showLoginOverlay();
+  }catch{ /* sin red: seguir local */ }
+}
+function showLoginOverlay(){ const el=document.getElementById('login-overlay'); if(el){ el.style.display='flex'; setTimeout(()=>document.getElementById('login-email')?.focus(),100);} }
+function hideLoginOverlay(){ const el=document.getElementById('login-overlay'); if(el) el.style.display='none'; }
+async function doLogin(){
+  const msg=document.getElementById('login-msg'); msg.textContent='';
+  if(!sb){ msg.textContent='Sin conexión'; return; }
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){ msg.textContent='Completá mail y contraseña'; return; }
+  const btn=document.getElementById('login-btn'); btn.disabled=true; btn.textContent='Entrando...';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled=false; btn.textContent='Entrar';
+  if(error){ msg.textContent='Mail o contraseña incorrectos'; return; }
+  currentUser=data.user; hideLoginOverlay();
+  const loaded=await loadFromSupabase();
+  if(loaded){ initClientSelectors(); renderComando(); }
+  syncToSupabase();                     // sube cambios locales hechos sin sesión
+}
+function skipLogin(){ hideLoginOverlay(); notify('Trabajando solo en este dispositivo (sin nube)'); }
+async function doLogout(){ if(sb) await sb.auth.signOut(); location.reload(); }
 function uid() { return Math.random().toString(36).slice(2,9); }
 function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function todayStr() { return new Date().toISOString().split('T')[0]; }
@@ -4118,7 +4162,8 @@ async function init() {
   restoreChat('ai-chat-messages', chatHistory, '<div class="msg-system">Contexto cargado · Escribe tu consulta abajo</div><div class="msg-ai">Hola Bruno 👋 Soy tu asistente con contexto completo de Concepto Development. Puedo ayudarte con estrategia, propuestas, scripts para MAX, copy, análisis de clientes o cualquier tema de tu agencia.\n\nCambiá el modo arriba para un contexto más específico, o escribime directamente.</div>');
   // Check server
   await checkServer();
-  // Load from Supabase (cloud backup)
+  // Login seguro + carga desde la nube (protegida por RLS)
+  await bootAuth();
   const loaded = await loadFromSupabase();
   if(loaded) { initClientSelectors(); renderComando(); }
   // After data is loaded, generate brief if server is online
